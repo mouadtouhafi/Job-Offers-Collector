@@ -91,3 +91,29 @@ volumes:
 - docker ps -a : 					this command lists (running + stopped) containers.
 
 
+
+/*****  working with PostgreSQL shell (psql)  ******/
+
+- docker exec -it jobs-container psql -U mouadthf -d jobsdb1 : this opens the PostgreSQL shell inside the container.
+- docker exec -it jobs-container psql -U mouadthf -d postgres : that command is how we open the PostgreSQL command-line 
+																client (psql) inside our running Docker container, 
+																connecting to the default postgres database.
+								docker exec → run a command inside a running container.
+								-it → interactive mode so we can type commands and see output in real time.
+								jobs-container → the name of our running PostgreSQL container.
+								psql → the PostgreSQL command-line client program.
+								-U mouadthf → connect as the PostgreSQL user mouadthf.
+								-d postgres → connect to the postgres database (the default administrative database).
+- inside the shell : 
+	\l : This shows all databases in the cluster.
+	\q : This exists the shell.
+	
+
+
+
+
+
+
+
+
+
