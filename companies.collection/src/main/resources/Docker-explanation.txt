@@ -80,5 +80,14 @@ volumes:
 
 
 
+/*****  Other commands  *****/
+
+- docker compose down : 			stop the database when we are done.
+- docker stop jobs-container : 		stops the container if it's running
+- docker rm jobs-container : 		removes the container.
+- docker rm -f jobs-container : 	(combines the two last commands) It stops and removes the container.
+- docker volume rm pgdata : 		this command delete the data completely, because that data stays saved in the pgdata volume.
+- docker ps : 						this command lists the running containers.
+- docker ps -a : 					this command lists (running + stopped) containers.
 
 
