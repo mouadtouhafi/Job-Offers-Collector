@@ -56,13 +56,14 @@ public class ExpleoJobCollector {
                     ));
                     safeClick(driver, popupAcceptBtn);
                 } catch (TimeoutException e) {
-                    // Popup didn't appear, continue
+                    /* Popup didn't appear, continue */
                 }
                 popupAppearedAndClosed = true;
             }
 
             while (!isFinalPageReached) {
                 logger.info("Scraping page " + pageCount++);
+                
                 /*
                  * Here we wait for the 5th iframe (index 4) to be available and automatically switch into it
                  * This 4th iframe contains the dynamically loaded job listings.
@@ -76,8 +77,8 @@ public class ExpleoJobCollector {
                                 By.cssSelector("div.container-fluid.iCIMS_JobsTable")
                         )
                 );
+                
                 List<WebElement> rows = jobTable.findElements(By.className("row"));
-
                 for (WebElement row : rows) {
                     WebElement link = row.findElement(By.cssSelector("div.col-xs-12.title a.iCIMS_Anchor"));
                     WebElement job = row.findElement(By.cssSelector("div.col-xs-12.title a.iCIMS_Anchor h3"));
@@ -92,6 +93,7 @@ public class ExpleoJobCollector {
                     String publishDate = date_element.getText().replaceAll("\\(.*\\)", "")
                                                                .replaceAll("\\n", "");
 
+                    
                     /*
                      * Each job bloc contains a DIV which has infos such "Location", "work mode", "contract type"
                      * We get that block which we named as "InfosDivs", after this, we iterate over its DIVs.
