@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: jobs-container
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: jobsdb1
+      POSTGRES_USER: mouadthf
+      POSTGRES_PASSWORD: mdthf97
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
