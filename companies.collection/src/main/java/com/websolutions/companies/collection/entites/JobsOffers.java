@@ -52,17 +52,14 @@ public class JobsOffers {
      * descriptions without hitting character length limits of standard text columns.
      * */
     @Lob
-    private String missions;
-
-    @Lob
-    private String qualifications;
+    private String post;
 
     public JobsOffers() {
     	
     }
     
 	public JobsOffers(Long id, String title, String company, String location, String url, String contractType,
-			String workMode, String publishDate, String missions, String qualifications) {
+			String workMode, String publishDate, String post) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -72,8 +69,7 @@ public class JobsOffers {
 		this.contractType = contractType;
 		this.workMode = workMode;
 		this.publishDate = publishDate;
-		this.missions = missions;
-		this.qualifications = qualifications;
+		this.post = post;
 	}
 
 	public Long getId() {
@@ -140,19 +136,11 @@ public class JobsOffers {
 		this.publishDate = publishDate;
 	}
 
-	public String getMissions() {
-		return missions;
+	public String getPost() {
+		return post;
 	}
 
-	public void setMissions(String missions) {
-		this.missions = missions;
-	}
-
-	public String getQualifications() {
-		return qualifications;
-	}
-
-	public void setQualifications(String qualifications) {
-		this.qualifications = qualifications;
+	public void setPost(String post) {
+		this.post = post;
 	}
 }
