@@ -190,7 +190,15 @@ public class ExpleoJobCollector {
                         jobOffer.setWorkMode(id_jobInfo.get(i).get(3));
                         jobOffer.setPublishDate(id_jobInfo.get(i).get(4));
                         jobOffer.setPost(text);
-                        jobsOffersRepository.save(jobOffer);
+                        if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                        		id_jobInfo.get(i).getFirst(), 
+                        		"Expleo Group", 
+                        		id_jobInfo.get(i).get(1), 
+                        		jobsLinks.get(i))){
+                        	jobsOffersRepository.save(jobOffer);
+                        }
+
+                        
                         
                         System.out.println(text);
                         System.out.println("=========================================================");
