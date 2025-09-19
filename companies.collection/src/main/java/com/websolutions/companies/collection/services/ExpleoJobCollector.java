@@ -16,6 +16,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
@@ -195,7 +196,12 @@ public class ExpleoJobCollector {
                         		"Expleo Group", 
                         		id_jobInfo.get(i).get(1), 
                         		jobsLinks.get(i))){
-                        	jobsOffersRepository.save(jobOffer);
+                        	
+                        	try {
+                        		jobsOffersRepository.save(jobOffer);
+							} catch (DataIntegrityViolationException e) {
+								logger.info("Duplicate detected: " + jobOffer.getTitle() + " @ " + jobOffer.getUrl());
+							}
                         }
 
                         
