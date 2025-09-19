@@ -281,6 +281,102 @@ public class AltenJobCollector {
 		}
 	}
 
+	
+	public void getForeignJobs_2() {
+    	Set<String> foreign_countries = ALTEN_COUNTRIES_LINK.keySet();
+    	String[] countries_set2 = {"AUSTRIA"};
+    	for(String country : foreign_countries) {
+    		if(Arrays.asList(countries_set2).contains(country)) {
+    			System.out.println(country);
+    			try {
+        			int jobIndex = 0;
+        		    HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
+        		    HashMap<Integer, String> jobsLinks = new HashMap<>();
+        			driver.get(ALTEN_COUNTRIES_LINK.get(country));
+        			List<WebElement> jobs = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
+        					By.cssSelector("div.openings-body.js-openings ul.opening-jobs li.opening-job"))
+            			);
+            		
+            		for(WebElement job : jobs) {
+            			try {
+            		        WebElement linkElement = job.findElement(By.cssSelector("a.link--block.details"));
+            		        String job_title = linkElement.findElement(By.cssSelector("h4.details-title")).getText();
+            		        String job_link = job.findElement(By.cssSelector("a.link--block.details")).getDomAttribute("href");
+            		        String location = linkElement.findElement(By.cssSelector("ul.job-list li:nth-of-type(1)")).getText().trim();
+            		        String contract_type = linkElement.findElement(By.cssSelector("ul.job-list li:nth-of-type(2)")).getText().trim();
+
+            		        System.out.println(job_title + " | " + location + " | " + contract_type + " | " + job_link);
+
+            		        List<String> infos = new ArrayList<>();
+            				infos.add(job_title.strip());
+                            infos.add(location.strip().replace("\n", ", "));
+                            infos.add(contract_type.strip());
+                            infos.add("N/A");
+                            infos.add("N/A");
+            				
+            				id_jobInfo.put(jobIndex, infos);
+            				jobsLinks.put(jobIndex, job_link);
+            				jobIndex++;
+                			
+    					} catch (Exception e) {
+    						e.printStackTrace();
+    						logger.log(Level.WARNING,  "[" + AltenJobCollector.class.getName() + "]" + e.getMessage().split("\n")[0]);
+    						continue;
+    					}
+            		}
+        			
+            		
+            		for(int id=0; id<jobsLinks.size(); id++) {
+            			driver.get(jobsLinks.get(id));
+            			String jobPostInnerHTML = "";
+            			WebElement jobDescription = wait.until(ExpectedConditions.presenceOfElementLocated(
+            					By.id("st-jobDescription"))
+            				);
+            			jobPostInnerHTML = jobPostInnerHTML + jobDescription.getDomProperty("innerHTML");
+            			
+            			WebElement jobQualification = wait.until(ExpectedConditions.presenceOfElementLocated(
+            					By.id("st-qualifications"))
+            				);
+            			jobPostInnerHTML = jobPostInnerHTML + jobQualification.getDomProperty("innerHTML");
+            			System.out.println(jobPostInnerHTML);
+            			
+            			WebElement applyBtn = wait.until(ExpectedConditions.presenceOfElementLocated(
+            					By.cssSelector("main.jobad-main.job section.job-apply.print-hidden a.button.button--primary.button--huge.js-oneclick.job-button"))
+            				);
+            			String applyLink = applyBtn.getDomAttribute("href");
+            			System.out.println(applyLink);
+            			
+            			JobsOffers jobOffer = new JobsOffers();
+						jobOffer.setTitle(id_jobInfo.get(id).getFirst());
+						jobOffer.setCompany("Alten");
+						jobOffer.setLocation(id_jobInfo.get(id).get(1));
+						jobOffer.setUrl(applyLink);
+						jobOffer.setContractType(id_jobInfo.get(id).get(2));
+						jobOffer.setWorkMode(id_jobInfo.get(id).get(3));
+						jobOffer.setPublishDate(id_jobInfo.get(id).get(4));
+						jobOffer.setPost(jobPostInnerHTML);
+
+						if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+								id_jobInfo.get(id).getFirst(), "Alten", id_jobInfo.get(id).get(1), applyLink)) {
+							try {
+								jobsOffersRepository.save(jobOffer);
+							} catch (DataIntegrityViolationException e) {
+								logger.info("Duplicate detected: " + jobOffer.getTitle() + " @ " + jobOffer.getUrl());
+							}
+						}
+            		}
+            		
+        			
+    			}catch (Exception e) {
+					// TODO: handle exception
+				}
+    			
+    		}
+    	}
+    }
+	
+	
+	
 	/*
 	 * Sometimes the jobs section are not in the center of the page, this will
 	 * result a problem because the element is in the html page but not clickable,
