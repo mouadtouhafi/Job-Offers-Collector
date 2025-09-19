@@ -1,0 +1,315 @@
+package com.websolutions.companies.collection.services;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
+import com.websolutions.companies.collection.entites.JobsOffers;
+import com.websolutions.companies.collection.repositories.JobsOffersRepository;
+
+@Service
+public class AltenJobCollector {
+
+	private final JobsOffersRepository jobsOffersRepository;
+	private static final Logger logger = Logger.getLogger(AltenJobCollector.class.getName());
+	private String AltenLink = "https://www.alten.com/careers/job-offers/";
+	private WebDriver driver = new EdgeDriver();
+	private final Map<String, String> ALTEN_COUNTRIES_LINK = new HashMap<String, String>();
+
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+	WebDriverWait fishingPopupWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+
+	public AltenJobCollector(JobsOffersRepository jobsOffersRepository) {
+		this.jobsOffersRepository = jobsOffersRepository;
+	}
+
+	public void closeDriver() {
+		driver.quit();
+	}
+
+	/*
+	 * This section collect the list of countries listed in Alten company. - After
+	 * diving to the URL, we need first to close the popup by pressing the Accept
+	 * button. - We are using the method safeClick() to scroll and make sure the
+	 * button appears in the browser window, otherwise an exception will be raised.
+	 * - The WebElement 'countriesInput' is the input element which contains the
+	 * list of countries. Before getting the list, we need first to click the option
+	 * input so the 'countriesDivList' element appears in the DOM. - After
+	 * collecting the list of countries, we add them to ALTEN_COUNTRIES.
+	 */
+	public void getCountries() {
+		driver.get(AltenLink);
+		WebElement cookieAcceptBtn = wait
+				.until(ExpectedConditions.visibilityOfElementLocated(By.id("tarteaucitronPersonalize2")));
+		safeClick(driver, cookieAcceptBtn);
+
+		WebElement countriesInput = wait.until(ExpectedConditions
+				.visibilityOfElementLocated(By.cssSelector("div.col.is-style-column-text.wp-block-bootstrap-column "
+						+ "div.selectize-input.items.full.has-options.has-items")));
+		safeClick(driver, countriesInput);
+
+		WebElement countriesDivList = wait.until(ExpectedConditions.visibilityOfElementLocated(
+				By.cssSelector("div.selectize-dropdown.single.form-control div.selectize-dropdown-content")));
+		List<WebElement> listCountries = countriesDivList.findElements(By.cssSelector("div.option "));
+		listCountries.forEach(element -> {
+			String _country = element.getText().strip();
+			String _link = element.getDomAttribute("data-value");
+			if (!_country.contains("COUNTRY")) {
+				ALTEN_COUNTRIES_LINK.put(_country, _link);
+			}
+		});
+		System.out.println(ALTEN_COUNTRIES_LINK);
+	}
+
+	public void getForeignJobs_1() {
+		Set<String> foreign_countries = ALTEN_COUNTRIES_LINK.keySet();
+		// String[] countries_set1 = { "UNITED KINGDOM", "SWEDEN", "PORTUGAL",
+		// "FINLAND", "SPAIN", "NETHERLANDS", "GERMANY", "SWITZERLAND", "FRANCE",
+		// "BELGIUM", "ITALY" };
+		String[] countries_set1 = { "ITALY" };
+		for (String country : foreign_countries) {
+			if (Arrays.asList(countries_set1).contains(country)) {
+				System.out.println(country);
+
+				try {
+					int jobIndex = 0;
+					boolean isFinalPageReached = false;
+					HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
+					HashMap<Integer, String> jobsLinks = new HashMap<>();
+					driver.get(ALTEN_COUNTRIES_LINK.get(country));
+					while (!isFinalPageReached) {
+						boolean popupAppearedAndClosed = false;
+						if (!popupAppearedAndClosed) {
+							/* Check if popup cookies is appearing */
+							try {
+								WebElement popupAcceptBtn = wait.until(
+										ExpectedConditions.elementToBeClickable(By.id("tarteaucitronPersonalize2")));
+								safeClick(driver, popupAcceptBtn);
+							} catch (TimeoutException e) {
+								// Popup didn't appear, continue
+							}
+							popupAppearedAndClosed = true;
+						}
+
+						boolean fishingPopupClosed = false;
+						if (!fishingPopupClosed) {
+							try {
+								List<WebElement> fishingPopupCloseBtn = fishingPopupWait
+										.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(
+												"div.modal-dialog.modal-dialog-centered.modal-lg div div.modal-header button")));
+								if (!fishingPopupCloseBtn.isEmpty()) {
+									safeClick(driver, fishingPopupCloseBtn.getFirst());
+								}
+								fishingPopupClosed = true;
+							} catch (Exception e) {
+								// TODO: handle exception
+							}
+						}
+
+						List<WebElement> jobs = wait
+								.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(
+										"div.wp-block-jobboard-loop div.is-style-card-default.wp-block-webfactory-card")));
+
+						for (WebElement job : jobs) {
+							try {
+								WebElement job_title_element = job.findElement(By.tagName("a"));
+								String job_title = job_title_element.getText();
+								String job_link = job_title_element.getDomAttribute("href");
+
+								WebElement location_element = job.findElement(
+										By.cssSelector("div.col-md-3.order-2.px-1.px-md-2.py-2.d-flex.card-location "
+												+ "span.location-list.ms-2.d-flex.flex-column"));
+								String location = location_element.getText();
+								WebElement publish_date_element = job.findElement(
+										By.cssSelector("div.col-md-2.order-3.px-1.px-md-2.py-2.card-date span.mx-2"));
+
+								String publish_date = publish_date_element.getText();
+								if (dateCheckValabilityStatus(publish_date)) {
+									List<String> infos = new ArrayList<>();
+									infos.add(job_title.strip());
+									infos.add(location.strip().replace("\n", ", "));
+									infos.add("N/A");
+									infos.add("N/A");
+									infos.add(publish_date.strip());
+									System.out.println(job_title + "  |  " + job_link + "  |  " + infos);
+
+									id_jobInfo.put(jobIndex, infos);
+									jobsLinks.put(jobIndex, job_link);
+									jobIndex++;
+								}
+
+								/*
+								 * Here we check if next button is invisible, if yes then we reached the final
+								 * page.
+								 */
+
+							} catch (Exception e) {
+								logger.log(Level.WARNING,
+										"[" + AltenJobCollector.class.getName() + "]" + e.getMessage().split("\n")[0]);
+								continue;
+							}
+						}
+						// break from while loop
+
+						try {
+							List<WebElement> btnList = driver.findElements(
+									By.cssSelector("div.col-lg-8.wp-block-bootstrap-column div nav ul li"));
+
+							if (btnList.isEmpty()) {
+								System.out.println("*********************************************************");
+								isFinalPageReached = true;
+							} else {
+								for (int i = 0; i < btnList.size(); i++) {
+									WebElement btn = btnList.get(i);
+									String cssClass = btn.getDomAttribute("class");
+
+									if (cssClass.contains("active")) {
+										if (i + 1 < btnList.size()) {
+											WebElement nextBtn = btnList.get(i + 1);
+											safeClick(driver, nextBtn);
+										} else {
+											isFinalPageReached = true; // active button is last page
+										}
+										break;
+									}
+								}
+							}
+
+						} catch (Exception e) {
+							logger.info("No more pages available " + e.getMessage());
+							isFinalPageReached = true;
+						}
+					}
+
+					// extract jobs full post
+					try {
+						for (int id = 0; id < id_jobInfo.size(); id++) {
+							driver.get(jobsLinks.get(id));
+
+							Wait<WebDriver> fluentWait = new FluentWait<>(driver)
+									.withTimeout(Duration.ofSeconds(10))
+									.pollingEvery(Duration.ofMillis(500))
+									.ignoring(NoSuchElementException.class);
+
+							List<WebElement> divPost = fluentWait.until(driver -> {
+                			    List<WebElement> elements = driver.findElements(
+                			    	By.cssSelector(".mb-5.wp-block-jobboard-offer-meta")
+                			    );
+                			    if (!elements.isEmpty()) {
+                			        return elements; // return if found
+                			    }
+                			    elements = driver.findElements(By.cssSelector(".my-0.wp-block-jobboard-offer-meta"));
+                			    if (!elements.isEmpty()) {
+                			        return elements.subList(1, 3);
+                			    }
+                			    return null; // keep waiting
+                			});
+
+							String innerHTML = "";
+							for (WebElement element : divPost) {
+								innerHTML = innerHTML + element.getDomProperty("innerHTML") + "\n";
+							}
+							innerHTML = innerHTML.stripTrailing();
+
+							// retrieving direct link to apply for the offer
+							WebElement applyBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By
+									.cssSelector("div.mx-md-2.is-style-button-blue.wp-block-jobboard-offer-action a")));
+							String applyLink = applyBtn.getDomAttribute("href");
+							System.out.println("the innerHTML is : " + innerHTML.replace("\n", ""));
+							System.out.println("the apply link is : " + applyLink);
+
+							JobsOffers jobOffer = new JobsOffers();
+							jobOffer.setTitle(id_jobInfo.get(id).getFirst());
+							jobOffer.setCompany("Alten");
+							jobOffer.setLocation(id_jobInfo.get(id).get(1));
+							jobOffer.setUrl(applyLink);
+							jobOffer.setContractType(id_jobInfo.get(id).get(2));
+							jobOffer.setWorkMode(id_jobInfo.get(id).get(3));
+							jobOffer.setPublishDate(id_jobInfo.get(id).get(4));
+							jobOffer.setPost(innerHTML);
+
+							if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+									id_jobInfo.get(id).getFirst(), "Alten", id_jobInfo.get(id).get(1), applyLink)) {
+								try {
+									jobsOffersRepository.save(jobOffer);
+								} catch (DataIntegrityViolationException e) {
+									logger.info("Duplicate detected: " + jobOffer.getTitle() + " @ " + jobOffer.getUrl());
+								}
+							}
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+				} catch (Exception e) {
+					String message = (e.getMessage() != null) ? e.getMessage().split("\n")[0] : "No message";
+					logger.log(Level.WARNING,
+							"[" + AltenJobCollector.class.getName() + "]" + " Failed at " + country + ": " + message,
+							e);
+					continue;
+				}
+
+			}
+
+		}
+	}
+
+	/*
+	 * Sometimes the jobs section are not in the center of the page, this will
+	 * result a problem because the element is in the html page but not clickable,
+	 * to solve this we need to perform a scroll.
+	 */
+	public void safeClick(WebDriver driver, WebElement element) {
+		try {
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
+			Thread.sleep(500);
+			element.click();
+		} catch (ElementClickInterceptedException e) {
+			/*
+			 * If there is a problem in the scroll, we can't perform a click with Selenium
+			 * we click the element using javascript
+			 */
+			((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+		} catch (Exception ex) {
+		}
+	}
+
+	public boolean dateCheckValabilityStatus(String date_to_check) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDate inputDate = LocalDate.parse(date_to_check, formatter);
+		LocalDate today = LocalDate.now();
+		LocalDate twoMonthsLater = inputDate.plusMonths(2);
+
+		if (twoMonthsLater.isAfter(today)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
