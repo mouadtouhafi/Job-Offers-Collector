@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
+
 @Service
 public class AltenJobCollector {
 
@@ -367,6 +368,105 @@ public class AltenJobCollector {
             		}
             		
         			
+    			}catch (Exception e) {
+					// TODO: handle exception
+				}
+    			
+    		}
+    	}
+    }
+	
+	
+	public void getForeignJobs_3() {
+    	Set<String> foreign_countries = ALTEN_COUNTRIES_LINK.keySet();
+    	String[] countries_set2 = {"INDIA"};
+    	for(String country : foreign_countries) {
+    		if(Arrays.asList(countries_set2).contains(country)) {
+    			System.out.println(country);
+    			try {
+        			int jobIndex = 0;
+        		    HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
+        		    HashMap<Integer, String> jobsLinks = new HashMap<>();
+        			driver.get(ALTEN_COUNTRIES_LINK.get(country));
+        			WebElement careersLink =  wait.until(ExpectedConditions.presenceOfElementLocated(
+        					By.cssSelector("#join-us div.row.row-cols-1.row-cols-md-2.justify-content-center.wp-block-bootstrap-row a.card-inner.text-decoration-none"))
+        			);
+        			safeClick(driver, careersLink);
+        			boolean popupAppearedAndClosed = false;
+            		if(!popupAppearedAndClosed) {
+                    	/* Check if popup cookies is appearing */
+                    	try {
+                            WebElement popupAcceptBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                                    By.id("tarteaucitronPersonalize2")
+                            ));
+                            safeClick(driver, popupAcceptBtn);
+                        } catch (TimeoutException e) {
+                            // Popup didn't appear, continue
+                        }
+                        popupAppearedAndClosed = true;
+                    }
+            		
+            		boolean fishingPopupClosed = false;
+            		if(!fishingPopupClosed) {
+            			try {
+            				List<WebElement> fishingPopupCloseBtn = fishingPopupWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
+            					By.cssSelector("div.modal-dialog.modal-dialog-centered.modal-lg div div.modal-header button")
+            				));
+            				if(!fishingPopupCloseBtn.isEmpty()) {
+            					safeClick(driver, fishingPopupCloseBtn.getFirst());
+            				}
+            				fishingPopupClosed = true;
+            			}catch (Exception e) {
+							// TODO: handle exception
+						}
+            		}
+        			
+        			
+        			List<WebElement> jobs = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
+        					By.cssSelector("#Opportunities div.accordion-item.wp-block-bootstrap-accordion"))
+            			);
+            		
+            		for(WebElement job : jobs) {
+            			try {
+            				
+            				safeClick(driver, job);
+            				WebElement title = job.findElement(By.cssSelector("header span"));
+            				
+            				WebElement post = wait.until(ExpectedConditions.presenceOfNestedElementLocatedBy(
+            				        job,
+            				        By.cssSelector("div.accordion-collapse.collapse.show")
+            				));
+            				String job_title = title.getText();
+            				String jobPostInnerHTML = post.getDomProperty("innerHTML").replace("\n", "");
+            				System.out.println(jobPostInnerHTML);
+            				
+            				JobsOffers jobOffer = new JobsOffers();
+    						jobOffer.setTitle(job_title);
+    						jobOffer.setCompany("Alten");
+    						jobOffer.setLocation("India");
+    						jobOffer.setUrl("N/A");
+    						jobOffer.setContractType("N/A");
+    						jobOffer.setWorkMode("N/A");
+    						jobOffer.setPublishDate("N/A");
+    						jobOffer.setPost(jobPostInnerHTML);
+
+    						if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+    								job_title, "Alten", "India", "N/A")) {
+    							try {
+    								jobsOffersRepository.save(jobOffer);
+    							} catch (DataIntegrityViolationException e) {
+    								logger.info("Duplicate detected: " + jobOffer.getTitle() + " @ " + jobOffer.getUrl());
+    							}
+    						}
+                			
+    					} catch (Exception e) {
+    						e.printStackTrace();
+    						logger.log(Level.WARNING,  "[" + AltenJobCollector.class.getName() + "]" + e.getMessage().split("\n")[0]);
+    						continue;
+    					}
+            		}
+        			
+            		
     			}catch (Exception e) {
 					// TODO: handle exception
 				}
