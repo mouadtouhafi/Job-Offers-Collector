@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -301,15 +302,27 @@ public class AltenJobCollector {
 	}
 
 	public boolean dateCheckValabilityStatus(String date_to_check) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		LocalDate inputDate = LocalDate.parse(date_to_check, formatter);
-		LocalDate today = LocalDate.now();
-		LocalDate twoMonthsLater = inputDate.plusMonths(2);
-
-		if (twoMonthsLater.isAfter(today)) {
-			return true;
-		} else {
-			return false;
+    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    	DateTimeFormatter formatter2 = DateTimeFormatter.ISO_LOCAL_DATE;
+    	
+    	LocalDate inputDate = null;
+    	try {
+    		inputDate = LocalDate.parse(date_to_check, formatter);
+		} catch (DateTimeParseException e) {
+			try {
+	            inputDate = LocalDate.parse(date_to_check, formatter2);
+	        } catch (DateTimeParseException ex) {
+	            throw new IllegalArgumentException("Date format not supported: " + date_to_check);
+	        }
 		}
-	}
+    	
+    	LocalDate today = LocalDate.now();
+    	LocalDate twoMonthsLater = inputDate.plusMonths(2);
+    	
+    	if (twoMonthsLater.isAfter(today)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
