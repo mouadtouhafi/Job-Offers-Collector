@@ -57,9 +57,9 @@ public class AvlJobCollector {
 						   job.findElement(By.cssSelector("td.colTitle span.jobTitle a"))
 						   .getDomAttribute("href");
 				
-				System.out.println(job_title+"  |  "+job_domain+"  |  "+location+"  |  "+publish_date+"  |  "+job_link);
 				
-				//if(dateCheckValabilityStatus(date_formatter(publish_date))) {
+				
+				if(dateCheckValabilityStatus(date_formatter(publish_date))) {
 					List<String> infos = new ArrayList<>();
 					infos.add(job_title.strip() + " - " + job_domain.strip());
 					infos.add(location.strip().replace("\n", ", "));
@@ -68,7 +68,7 @@ public class AvlJobCollector {
 					id_jobInfo.put(jobIndex, infos);
 					jobsLinks.put(jobIndex, job_link);
 					jobIndex++;
-				//}
+				}
 			}
 			
 			try {
@@ -138,7 +138,7 @@ public class AvlJobCollector {
 	}
 	
 	
-	public void safeClick(WebDriver driver, WebElement element) {
+	private void safeClick(WebDriver driver, WebElement element) {
 		try {
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
 			Thread.sleep(500);
@@ -151,14 +151,9 @@ public class AvlJobCollector {
 	}
 	
 	private String date_formatter(String input_date) {
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH);
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
-        LocalDate date = LocalDate.parse(input_date, inputFormatter);
-        String formattedDate = date.format(outputFormatter);
-
-        //System.out.println(formattedDate); 
-        return formattedDate;
+		 DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH);
+		 LocalDate date = LocalDate.parse(input_date.trim(), inputFormatter);
+		 return date.format(DateTimeFormatter.ISO_LOCAL_DATE); 
 	}
 	
 	public boolean dateCheckValabilityStatus(String date_to_check) {
