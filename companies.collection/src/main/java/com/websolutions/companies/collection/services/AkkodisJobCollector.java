@@ -20,7 +20,9 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.dao.DataIntegrityViolationException;
 
+import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
 public class AkkodisJobCollector {
@@ -72,9 +74,11 @@ public class AkkodisJobCollector {
 			popupAppearedAndClosed = true;
 		}
 		
-		WebElement chatbot_iframe = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("__sense-widget")));
-		((JavascriptExecutor) driver).executeScript("document.getElementById('__sense-widget').style.display='none';");
-		((JavascriptExecutor) driver).executeScript("document.getElementById('__sense-widget-button').style.display='none';");
+		List<WebElement> chatbot_iframe = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.id("__sense-widget")));
+		if(chatbot_iframe.size() > 0) {
+			((JavascriptExecutor) driver).executeScript("document.getElementById('__sense-widget').style.display='none';");
+			((JavascriptExecutor) driver).executeScript("document.getElementById('__sense-widget-button').style.display='none';");
+		}
 		
 		while (!isFinalPageReached) {
 			List<WebElement> jobs = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
@@ -137,7 +141,7 @@ public class AkkodisJobCollector {
 				if (nextPageBtn.isEmpty()) {
 					isFinalPageReached = true;
 				} else {
-					String cssClass = nextPageBtn.getFirst().getAttribute("class");
+					String cssClass = nextPageBtn.getFirst().getDomAttribute("class");
 					if(!cssClass.contains("pe-none") && page_index<maxPagesNumber) {
 						safeClick(driver, nextPageBtn.getFirst());
 						page_index++;
@@ -174,6 +178,28 @@ public class AkkodisJobCollector {
 //				
 				System.out.println("\n\n"+"  "+id+"  :  "+innerHTML);
 				System.out.println(apply_link);
+				
+				JobsOffers jobOffer = new JobsOffers();
+                jobOffer.setTitle(id_jobInfo.get(id).getFirst());
+                jobOffer.setCompany("Akkodis");
+                jobOffer.setLocation(id_jobInfo.get(id).get(1));
+                jobOffer.setUrl(apply_link);
+                jobOffer.setContractType(id_jobInfo.get(id).get(3));
+                jobOffer.setWorkMode("N/A");
+                jobOffer.setPublishDate(id_jobInfo.get(id).get(2));
+                jobOffer.setPost(innerHTML);
+                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                		id_jobInfo.get(id).getFirst(), 
+                		"Akkodis", 
+                		id_jobInfo.get(id).get(1), 
+                		apply_link)){
+                	
+                	try {
+                		jobsOffersRepository.save(jobOffer);
+					} catch (DataIntegrityViolationException e) {
+						logger.info("Duplicate detected: " + jobOffer.getTitle() + " @ " + jobOffer.getUrl());
+					}
+                }
 			} catch (Exception e) {
 				System.out.println("⚠️ Unexpected error at job " + id + " (" + jobsLinks.get(id) + "): " + e.getMessage());
 		        continue;
