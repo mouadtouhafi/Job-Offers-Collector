@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -14,20 +15,35 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import com.websolutions.companies.collection.entites.JobsOffers;
+import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
 @Service
 public class LearJobCollection {
+	
+	private static final Logger logger = Logger.getLogger(ExpleoJobCollector.class.getName());
+    private final HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
+    private final HashMap<Integer, String> jobsLinks = new HashMap<>();
+    private final JobsOffersRepository jobsOffersRepository;
+    private WebDriver driver;
+    private boolean isFinalPageReached = false;
+    private String LearLink = "https://jobs.lear.com/search/";
+	
+	public LearJobCollection(JobsOffersRepository jobsOffersRepository) {
+		super();
+		this.jobsOffersRepository = jobsOffersRepository;
+	}
+
+
 	public void getFulljobs() {
-		int jobIndex = 0;
-		boolean isFinalPageReached = false;
-		HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
-		HashMap<Integer, String> jobsLinks = new HashMap<>();
-		
-		WebDriver driver = new EdgeDriver();
+		int jobIndex = 0;		
+		driver = new EdgeDriver();
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
 
-		driver.get("https://jobs.lear.com/search/");
+		driver.get(LearLink);
 		
 		boolean popupAppearedAndClosed = false;
 		if (!popupAppearedAndClosed) {
@@ -77,7 +93,7 @@ public class LearJobCollection {
 					btnList.remove(btnList.size()-1);
 					btnList.remove(0);
 					for (int i = 0; i < btnList.size(); i++) {
-						String cssClass = btnList.get(i).getAttribute("class");
+						String cssClass = btnList.get(i).getDomAttribute("class");
 						System.out.println("cssClass : "+cssClass);
 						
 						if (cssClass.contains("active")) {
@@ -110,6 +126,7 @@ public class LearJobCollection {
 				WebElement innerHTMLElement = extraInfosContainer.get(6).findElement(By.cssSelector("div.row"));
 				innerHTML = innerHTMLElement.getDomProperty("innerHTML");
 				
+				String location = extraInfosContainer.get(2).findElement(By.cssSelector("div.row span:nth-child(2)")).getText();
 				String job_domain = extraInfosContainer.get(3).findElement(By.cssSelector("div.row span:nth-child(2)")).getText();
 				
 				String apply_link = "https://jobs.avl.com" + driver.findElement(
@@ -120,6 +137,28 @@ public class LearJobCollection {
 				System.out.println("\n\n"+"  "+id+"  :  "+innerHTML);
 				System.out.println(apply_link);
 				System.out.println(job_domain);
+				
+				JobsOffers jobOffer = new JobsOffers();
+                jobOffer.setTitle(id_jobInfo.get(id).getFirst());
+                jobOffer.setCompany("LEAR");
+                jobOffer.setLocation(location);
+                jobOffer.setUrl(apply_link);
+                jobOffer.setContractType("N/A");
+                jobOffer.setWorkMode("N/A");
+                jobOffer.setPublishDate("N/A");
+                jobOffer.setPost(innerHTML);
+                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                		id_jobInfo.get(id).getFirst(), 
+                		"LEAR", 
+                		location, 
+                		apply_link)){
+                	
+                	try {
+                		jobsOffersRepository.save(jobOffer);
+					} catch (DataIntegrityViolationException e) {
+						logger.info("Duplicate detected: " + jobOffer.getTitle() + " @ " + jobOffer.getUrl());
+					}
+                }
 			} catch (Exception e) {
 				System.out.println("⚠️ Unexpected error at job " + id + " (" + jobsLinks.get(id) + "): " + e.getMessage());
 		        continue;
