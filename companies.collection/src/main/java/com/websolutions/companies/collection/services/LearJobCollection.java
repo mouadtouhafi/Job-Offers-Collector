@@ -165,9 +165,12 @@ public class LearJobCollection {
 			}
 			
 		}
-		
+		closeDriver();
 	}
 	
+	private void closeDriver(){
+        driver.quit();
+    }
 	
 	public void safeClick(WebDriver driver, WebElement element) {
 		try {

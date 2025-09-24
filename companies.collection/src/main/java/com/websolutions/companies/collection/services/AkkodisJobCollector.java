@@ -116,6 +116,7 @@ public class AkkodisJobCollector {
 					}
 				}catch (Exception e) {
 					e.printStackTrace();
+					continue;
 				}
 				
 					
@@ -208,8 +209,12 @@ public class AkkodisJobCollector {
 			}
 			
 		}
-//		driver.close();
+		closeDriver();
 	}
+	
+	private void closeDriver(){
+        driver.quit();
+    }
 	
 	private String date_formatter(String input_date) {
 	    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
