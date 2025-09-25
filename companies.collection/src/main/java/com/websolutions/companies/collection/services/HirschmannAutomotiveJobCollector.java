@@ -48,7 +48,7 @@ public class HirschmannAutomotiveJobCollector {
 		options = new EdgeOptions();
 
 		// Enable headless mode
-		// options.addArguments("--headless");
+		 options.addArguments("--headless");
 
 		// Optional: Add other arguments for optimization
 		options.addArguments("--disable-gpu"); // For Windows systems
@@ -122,7 +122,8 @@ public class HirschmannAutomotiveJobCollector {
 
 			Set<String> keys = domain_link_list.keySet();
 			for (String key : keys) {
-				driver.get(domain_link_list.get(key));
+				System.out.println(domain_link_list.get(key));
+				driver.get("https://career.hirschmann-automotive.com" + domain_link_list.get(key));
 
 				List<WebElement> jobs = wait.until(ExpectedConditions
 						.presenceOfAllElementsLocatedBy(By.cssSelector("div.jobs-list ul.jobs-list li")));
