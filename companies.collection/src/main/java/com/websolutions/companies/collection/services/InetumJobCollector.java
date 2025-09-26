@@ -16,7 +16,9 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.dao.DataIntegrityViolationException;
 
+import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
 public class InetumJobCollector {
@@ -145,6 +147,28 @@ public class InetumJobCollector {
 					
 				System.out.println(apply_link);
 				System.out.println();
+				
+				JobsOffers jobOffer = new JobsOffers();
+                jobOffer.setTitle(id_jobInfo.get(id).getFirst());
+                jobOffer.setCompany("Inetum");
+                jobOffer.setLocation(id_jobInfo.get(id).get(1));
+                jobOffer.setUrl(apply_link);
+                jobOffer.setContractType(id_jobInfo.get(id).get(2));
+                jobOffer.setWorkMode("N/A");
+                jobOffer.setPublishDate("N/A");
+                jobOffer.setPost(innerHTML);
+                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                		id_jobInfo.get(id).getFirst(), 
+                		"Inetum", 
+                		id_jobInfo.get(id).get(1), 
+                		apply_link)){
+                	
+                	try {
+                		jobsOffersRepository.save(jobOffer);
+					} catch (DataIntegrityViolationException e) {
+						logger.info("Duplicate detected: " + jobOffer.getTitle() + " @ " + jobOffer.getUrl());
+					}
+                }
 			} catch (Exception e) {
 				System.out.println("⚠️ Unexpected error at job " + id + " (" + jobsLinks.get(id) + "): " + e.getMessage());
 		        continue;
