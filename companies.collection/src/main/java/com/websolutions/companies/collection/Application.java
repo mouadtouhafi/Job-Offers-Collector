@@ -9,6 +9,7 @@ import com.websolutions.companies.collection.services.AltenJobCollector;
 import com.websolutions.companies.collection.services.AvlJobCollector;
 import com.websolutions.companies.collection.services.ExpleoJobCollector;
 import com.websolutions.companies.collection.services.HirschmannAutomotiveJobCollector;
+import com.websolutions.companies.collection.services.InetumJobCollector;
 import com.websolutions.companies.collection.services.LearJobCollection;
 import com.websolutions.companies.collection.services.StellantisJobCollector;
 
@@ -22,6 +23,7 @@ public class Application implements CommandLineRunner {
     private final AkkodisJobCollector akkodisJobCollector;
     private final StellantisJobCollector stellantisJobCollector;
     private final HirschmannAutomotiveJobCollector hirschmannAutomotiveJobCollector;
+    private final InetumJobCollector inetumJobCollector;
 
     public Application(ExpleoJobCollector expleoJobCollector, 
     				   AltenJobCollector altenJobCollector, 
@@ -29,7 +31,8 @@ public class Application implements CommandLineRunner {
     				   LearJobCollection learJobCollection,
     				   AkkodisJobCollector akkodisJobCollector,
     				   StellantisJobCollector stellantisJobCollector,
-    				   HirschmannAutomotiveJobCollector hirschmannAutomotiveJobCollector) {
+    				   HirschmannAutomotiveJobCollector hirschmannAutomotiveJobCollector,
+    				   InetumJobCollector inetumJobCollector) {
         this.expleoJobCollector = expleoJobCollector;
         this.altenJobCollector = altenJobCollector;
         this.avlJobCollector = avlJobCollector;
@@ -37,6 +40,7 @@ public class Application implements CommandLineRunner {
         this.akkodisJobCollector = akkodisJobCollector;
         this.stellantisJobCollector = stellantisJobCollector;
         this.hirschmannAutomotiveJobCollector = hirschmannAutomotiveJobCollector;
+        this.inetumJobCollector = inetumJobCollector;
     }
 
     public static void main(String[] args) {
@@ -61,6 +65,8 @@ public class Application implements CommandLineRunner {
     	
 //    	stellantisJobCollector.getFulljobs();
     	
-    	hirschmannAutomotiveJobCollector.getFulljobs();
+//    	hirschmannAutomotiveJobCollector.getFulljobs();
+    	
+    	inetumJobCollector.getFulljobs(true);
     }
 }

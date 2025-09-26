@@ -122,7 +122,7 @@ public class InetumJobCollector {
 					if(nextBtnText.contains("forward")) {
 						safeClick(driver, nextBtn);
 						maxNumberOfPagesClicked--;
-						if(isFullJobsCollection == true && maxNumberOfPagesClicked == 0) {
+						if(isFullJobsCollection == false && maxNumberOfPagesClicked == 0) {
 							isFinalPageReached = true;
 						}
 					}else {
