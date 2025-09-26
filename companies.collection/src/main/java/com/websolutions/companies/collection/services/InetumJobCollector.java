@@ -17,10 +17,12 @@ import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
+@Service
 public class InetumJobCollector {
 	
 	private static final Logger logger = Logger.getLogger(ExpleoJobCollector.class.getName());
