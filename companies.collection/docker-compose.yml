@@ -9,8 +9,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/jobsdb1
       SPRING_DATASOURCE_USERNAME: mouadthf
       SPRING_DATASOURCE_PASSWORD: mdthf97
+      SELENIUM_URL: http://selenium:4444
     depends_on:
       - postgres
+      - selenium
 
   postgres:
     image: postgres:16
@@ -24,6 +26,12 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  selenium:
+    image: selenium/standalone-edge:latest
+    container_name: selenium
+    ports:
+      - "4444:4444"
 
 volumes:
   pgdata:
