@@ -1,5 +1,7 @@
 package com.websolutions.companies.collection.services;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +18,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -33,6 +36,8 @@ public class AvlJobCollector {
     private final HashMap<Integer, String> jobsLinks = new HashMap<>();
     private final JobsOffersRepository jobsOffersRepository;
     private WebDriver driver;
+    private EdgeOptions options;
+    private int maxNumberOfPagesClicked = 3;
     private boolean isFinalPageReached = false;
     private String AvlLink = "https://jobs.avl.com/search/?createNewAlert=false&q=&locationsearch=";
     
@@ -40,9 +45,20 @@ public class AvlJobCollector {
         this.jobsOffersRepository = jobsOffersRepository;
     }
 	
-	public void getFulljobs() {
+	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
 		int jobIndex = 0;
-		driver = new EdgeDriver();
+		options = new EdgeOptions();
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless=new");
+		options.addArguments("--disable-dev-shm-usage");
+		options.addArguments("--lang=en-US");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-notifications");
+		
+        WebDriver driver = new RemoteWebDriver(
+        		URI.create("http://selenium:4444").toURL(),
+        	    options
+        	);
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
 
 		driver.get(AvlLink);
@@ -106,6 +122,10 @@ public class AvlJobCollector {
 							if (i + 1 < btnList.size()) {
 								WebElement nextBtn = btnList.get(i + 1).findElement(By.tagName("a"));
 								safeClick(driver, nextBtn);
+								maxNumberOfPagesClicked--;
+								if(isFullJobsCollection == false && maxNumberOfPagesClicked == 0) {
+									isFinalPageReached = true;
+								}
 								System.out.println("page clicked");
 
 			                    wait.until(ExpectedConditions.stalenessOf(jobs.getFirst()));
