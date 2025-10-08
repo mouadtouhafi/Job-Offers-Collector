@@ -242,7 +242,7 @@ public class ExpleoJobCollector {
                         		id_jobInfo.get(i).getFirst(), 
                         		"Expleo Group", 
                         		id_jobInfo.get(i).get(1), 
-                        		jobsLinks.get(i))){
+                        		applyLink)){
                         	
                         	try {
                         		jobsOffersRepository.save(jobOffer);
