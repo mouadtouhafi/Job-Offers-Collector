@@ -1,5 +1,7 @@
 package com.websolutions.companies.collection.services;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -18,24 +20,25 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
-@Service
+
 public class AkkodisJobCollector {
 	
 	private static final Logger logger = Logger.getLogger(ExpleoJobCollector.class.getName());
     private final HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
     private final HashMap<Integer, String> jobsLinks = new HashMap<>();
     private final JobsOffersRepository jobsOffersRepository;
-    private WebDriver driver;
     private EdgeOptions options;
+    private WebDriver driver;
     private boolean isFinalPageReached = false;
+    private int maxNumberOfPagesClicked = 3;
     private String AkkodisLink = "https://www.akkodis.com/en-us/careers/job-results";
 	
 	public AkkodisJobCollector(JobsOffersRepository jobsOffersRepository) {
@@ -43,20 +46,22 @@ public class AkkodisJobCollector {
 		this.jobsOffersRepository = jobsOffersRepository;
 	}
 
-	public void getFulljobs() {
+	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
 		int page_index = 1;
 		int jobIndex = 0;
 		
 		options = new EdgeOptions();
-
-        // Enable headless mode
-        //options.addArguments("--headless");
-
-        // Optional: Add other arguments for optimization
-        options.addArguments("--disable-gpu"); // For Windows systems
-        //options.addArguments("--window-size=1200,880"); // Set a specific window size
-        options.addArguments("--disable-notifications"); // Disable pop-ups
-
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless=new");
+		options.addArguments("--disable-dev-shm-usage");
+		options.addArguments("--lang=en-US");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-notifications");
+		
+		driver = new RemoteWebDriver(
+        		URI.create("http://selenium:4444").toURL(),
+        	    options
+        	);
 		
 		driver = new EdgeDriver(options);
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
@@ -148,6 +153,10 @@ public class AkkodisJobCollector {
 					if(!cssClass.contains("pe-none") && page_index<maxPagesNumber) {
 						safeClick(driver, nextPageBtn.getFirst());
 						page_index++;
+						maxNumberOfPagesClicked--;
+						if(isFullJobsCollection == false && maxNumberOfPagesClicked == 0) {
+							isFinalPageReached = true;
+						}
 						//System.out.println(page_index);
 						//wait.until(ExpectedConditions.stalenessOf(jobs.getFirst()));
 					}else {
