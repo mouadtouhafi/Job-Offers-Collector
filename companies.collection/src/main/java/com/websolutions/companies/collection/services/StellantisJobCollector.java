@@ -1,5 +1,7 @@
 package com.websolutions.companies.collection.services;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,8 +18,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,6 +38,7 @@ public class StellantisJobCollector {
     private WebDriver driver;
     private EdgeOptions options;
     private boolean isFinalPageReached = false;
+    private int maxNumberOfPagesClicked = 3;
     private String StellantisLink = "https://careers.stellantis.com/job-search-results/";
 	
 	public StellantisJobCollector(JobsOffersRepository jobsOffersRepository) {
@@ -43,22 +46,22 @@ public class StellantisJobCollector {
 		this.jobsOffersRepository = jobsOffersRepository;
 	}
 	
-	public void getFulljobs() {
+	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
 		int jobIndex = 0;
 		
-		driver = new EdgeDriver();
 		options = new EdgeOptions();
-
-        // Enable headless mode
-        //options.addArguments("--headless");
-
-        // Optional: Add other arguments for optimization
-        options.addArguments("--disable-gpu"); // For Windows systems
-        //options.addArguments("--window-size=1200,880"); // Set a specific window size
-        options.addArguments("--disable-notifications"); // Disable pop-ups
-
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless=new");
+		options.addArguments("--disable-dev-shm-usage");
+		options.addArguments("--lang=en-US");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-notifications");
 		
-		driver = new EdgeDriver(options);
+        driver = new RemoteWebDriver(
+        		URI.create("http://selenium:4444").toURL(),
+        	    options
+        	);
+        
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 		driver.get(StellantisLink);
@@ -114,6 +117,10 @@ public class StellantisJobCollector {
 					WebElement nextArrow = btnList.get(btnList.size()-2);
 					if(nextArrow.getText().equals(">")) {
 						safeClick(driver, nextArrow);
+						maxNumberOfPagesClicked--;
+						if(isFullJobsCollection == false && maxNumberOfPagesClicked == 0) {
+							isFinalPageReached = true;
+						}
 						wait.until(ExpectedConditions.stalenessOf(jobs.getFirst()));
 					}else {
 						isFinalPageReached = true;

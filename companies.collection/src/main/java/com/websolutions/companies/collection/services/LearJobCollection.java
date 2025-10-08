@@ -1,5 +1,7 @@
 package com.websolutions.companies.collection.services;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +14,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,7 +32,9 @@ public class LearJobCollection {
     private final HashMap<Integer, String> jobsLinks = new HashMap<>();
     private final JobsOffersRepository jobsOffersRepository;
     private WebDriver driver;
+    private EdgeOptions options;
     private boolean isFinalPageReached = false;
+    private int maxNumberOfPagesClicked = 3;
     private String LearLink = "https://jobs.lear.com/search/";
 	
 	public LearJobCollection(JobsOffersRepository jobsOffersRepository) {
@@ -38,9 +43,20 @@ public class LearJobCollection {
 	}
 
 
-	public void getFulljobs() {
+	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
 		int jobIndex = 0;		
-		driver = new EdgeDriver();
+		options = new EdgeOptions();
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless=new");
+		options.addArguments("--disable-dev-shm-usage");
+		options.addArguments("--lang=en-US");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-notifications");
+		
+        driver = new RemoteWebDriver(
+        		URI.create("http://selenium:4444").toURL(),
+        	    options
+        	);
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
 
 		driver.get(LearLink);
@@ -100,6 +116,10 @@ public class LearJobCollection {
 							if (i + 1 < btnList.size()) {
 								WebElement nextBtn = btnList.get(i + 1).findElement(By.tagName("a"));
 								safeClick(driver, nextBtn);
+								maxNumberOfPagesClicked--;
+								if(isFullJobsCollection == false && maxNumberOfPagesClicked == 0) {
+									isFinalPageReached = true;
+								}
 								System.out.println("page clicked");
 
 			                    wait.until(ExpectedConditions.stalenessOf(jobs.getFirst()));

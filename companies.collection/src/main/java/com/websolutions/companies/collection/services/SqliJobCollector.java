@@ -1,5 +1,7 @@
 package com.websolutions.companies.collection.services;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,8 +14,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -39,21 +41,22 @@ public class SqliJobCollector {
 		this.jobsOffersRepository = jobsOffersRepository;
 	}
     
-    public void getFulljobs() {
+    public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
 		int jobIndex = 0;
 		
 		options = new EdgeOptions();
-
-        // Enable headless mode
-        //options.addArguments("--headless");
-
-        // Optional: Add other arguments for optimization
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless=new");
+		options.addArguments("--disable-dev-shm-usage");
 		options.addArguments("--lang=en-US");
-        options.addArguments("--disable-gpu"); // For Windows systems
-        //options.addArguments("--window-size=1200,880"); // Set a specific window size
-        options.addArguments("--disable-notifications"); // Disable pop-ups
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-notifications");
 		
-		driver = new EdgeDriver(options);
+        driver = new RemoteWebDriver(
+        		URI.create("http://selenium:4444").toURL(),
+        	    options
+        	);
+        
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
 		driver.get(SqliLink);
@@ -116,6 +119,10 @@ public class SqliJobCollector {
 						System.out.println("================================================================>  button disabled" );
 					}else {
 						safeClick(driver, btnList.getFirst());
+						maxNumberOfPagesClicked--;
+						if(isFullJobsCollection == false && maxNumberOfPagesClicked == 0) {
+							isFinalPageReached = true;
+						}
 					}
 				}
 	         } catch (Exception e) {
