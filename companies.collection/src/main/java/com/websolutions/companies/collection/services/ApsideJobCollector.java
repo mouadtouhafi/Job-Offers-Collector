@@ -1,5 +1,7 @@
 package com.websolutions.companies.collection.services;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,8 +17,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,7 +34,6 @@ public class ApsideJobCollector {
     private final HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
     private final HashMap<Integer, String> jobsLinks = new HashMap<>();
     private final JobsOffersRepository jobsOffersRepository;
-    private WebDriver driver;
     private EdgeOptions options;
     private String ApsideLink = "https://www.apside.com/fr/nos-offres-emploi/";
     private int maxNumberOfPagesClicked = 3;
@@ -43,21 +44,21 @@ public class ApsideJobCollector {
 		this.jobsOffersRepository = jobsOffersRepository;
 	}
 	
-	public void getFulljobs(boolean isFullJobsCollection) {
+	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
 		int jobIndex = 0;
 		
 		options = new EdgeOptions();
-
-        // Enable headless mode
-        //options.addArguments("--headless");
-
-        // Optional: Add other arguments for optimization
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless=new");
+		options.addArguments("--disable-dev-shm-usage");
 		options.addArguments("--lang=en-US");
-        options.addArguments("--disable-gpu"); // For Windows systems
-        //options.addArguments("--window-size=1200,880"); // Set a specific window size
-        options.addArguments("--disable-notifications"); // Disable pop-ups
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-notifications");
 		
-		driver = new EdgeDriver(options);
+        WebDriver driver = new RemoteWebDriver(
+        		URI.create("http://selenium:4444").toURL(),
+        	    options
+        	);
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
 		driver.get(ApsideLink);
