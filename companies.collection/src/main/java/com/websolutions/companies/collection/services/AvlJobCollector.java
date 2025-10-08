@@ -55,7 +55,7 @@ public class AvlJobCollector {
         options.addArguments("--disable-gpu");
         options.addArguments("--disable-notifications");
 		
-        WebDriver driver = new RemoteWebDriver(
+        driver = new RemoteWebDriver(
         		URI.create("http://selenium:4444").toURL(),
         	    options
         	);
