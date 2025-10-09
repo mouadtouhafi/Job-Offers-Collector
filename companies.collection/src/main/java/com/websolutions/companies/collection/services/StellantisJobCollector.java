@@ -56,6 +56,7 @@ public class StellantisJobCollector {
 		options.addArguments("--lang=en-US");
         options.addArguments("--disable-gpu");
         options.addArguments("--disable-notifications");
+        options.addArguments("--window-size=1920,1080");
 		
         driver = new RemoteWebDriver(
         		URI.create("http://selenium:4444").toURL(),
