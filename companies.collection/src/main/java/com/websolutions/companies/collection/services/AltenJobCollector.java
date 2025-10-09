@@ -1,6 +1,7 @@
 package com.websolutions.companies.collection.services;
 
-import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,10 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -23,7 +22,8 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
@@ -34,17 +34,20 @@ import org.springframework.stereotype.Service;
 import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
+
+
 @Service
 public class AltenJobCollector {
 
 	private final JobsOffersRepository jobsOffersRepository;
 	private static final Logger logger = Logger.getLogger(AltenJobCollector.class.getName());
 	private String AltenLink = "https://www.alten.com/careers/job-offers/";
-	private WebDriver driver = new EdgeDriver();
+	private WebDriver driver;
+	private EdgeOptions options;
 	private final Map<String, String> ALTEN_COUNTRIES_LINK = new HashMap<String, String>();
 
-	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-	WebDriverWait fishingPopupWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+	WebDriverWait wait;
+	WebDriverWait fishingPopupWait;
 
 	public AltenJobCollector(JobsOffersRepository jobsOffersRepository) {
 		this.jobsOffersRepository = jobsOffersRepository;
@@ -53,6 +56,27 @@ public class AltenJobCollector {
 	public void closeDriver() {
 		driver.quit();
 	}
+	
+	public void setupDriver() throws MalformedURLException {
+		options = new EdgeOptions();
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless=new");
+		options.addArguments("--disable-dev-shm-usage");
+		options.addArguments("--lang=en-US");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--window-size=1920,1080");
+		
+        driver = new RemoteWebDriver(
+        		URI.create("http://selenium:4444").toURL(),
+        	    options
+        	);
+        
+        wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        fishingPopupWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+        System.out.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+	}
+
 
 	/*
 	 * This section collect the list of countries listed in Alten company. - After
@@ -64,40 +88,45 @@ public class AltenJobCollector {
 	 * input so the 'countriesDivList' element appears in the DOM. - After
 	 * collecting the list of countries, we add them to ALTEN_COUNTRIES.
 	 */
-	public void getCountries() {
-		driver.get(AltenLink);
-		WebElement cookieAcceptBtn = wait
-				.until(ExpectedConditions.visibilityOfElementLocated(By.id("tarteaucitronPersonalize2")));
-		safeClick(driver, cookieAcceptBtn);
+	public void getCountries() throws MalformedURLException {
+		try {
+			driver.get(AltenLink);
+			WebElement cookieAcceptBtn = wait
+					.until(ExpectedConditions.visibilityOfElementLocated(By.id("tarteaucitronPersonalize2")));
+			safeClick(driver, cookieAcceptBtn);
 
-		WebElement countriesInput = wait.until(ExpectedConditions
-				.visibilityOfElementLocated(By.cssSelector("div.col.is-style-column-text.wp-block-bootstrap-column "
-						+ "div.selectize-input.items.full.has-options.has-items")));
-		safeClick(driver, countriesInput);
+			WebElement countriesInput = wait.until(ExpectedConditions
+					.visibilityOfElementLocated(By.cssSelector("div.col.is-style-column-text.wp-block-bootstrap-column "
+							+ "div.selectize-input.items.full.has-options.has-items")));
+			safeClick(driver, countriesInput);
 
-		WebElement countriesDivList = wait.until(ExpectedConditions.visibilityOfElementLocated(
-				By.cssSelector("div.selectize-dropdown.single.form-control div.selectize-dropdown-content")));
-		List<WebElement> listCountries = countriesDivList.findElements(By.cssSelector("div.option "));
-		listCountries.forEach(element -> {
-			String _country = element.getText().strip();
-			String _link = element.getDomAttribute("data-value");
-			if (!_country.contains("COUNTRY")) {
-				ALTEN_COUNTRIES_LINK.put(_country, _link);
-			}
-		});
-		System.out.println(ALTEN_COUNTRIES_LINK);
+			WebElement countriesDivList = wait.until(ExpectedConditions.visibilityOfElementLocated(
+					By.cssSelector("div.selectize-dropdown.single.form-control div.selectize-dropdown-content")));
+			List<WebElement> listCountries = countriesDivList.findElements(By.cssSelector("div.option"));
+			listCountries.forEach(element -> {
+				String _country = element.getText().strip();
+				String _link = element.getDomAttribute("data-value");
+				if (!_country.contains("COUNTRY")) {
+					ALTEN_COUNTRIES_LINK.put(_country, _link);
+				}
+			});
+			System.out.println(ALTEN_COUNTRIES_LINK);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
-	public void getForeignJobs_1() {
+	public void getForeignJobs_1(boolean isFullJobsCollection) {
 		Set<String> foreign_countries = ALTEN_COUNTRIES_LINK.keySet();
-		// String[] countries_set1 = { "UNITED KINGDOM", "SWEDEN", "PORTUGAL",
-		// "FINLAND", "SPAIN", "NETHERLANDS", "GERMANY", "SWITZERLAND", "FRANCE",
-		// "BELGIUM", "ITALY" };
-		String[] countries_set1 = { "ITALY" };
+		 String[] countries_set1 = { "UNITED KINGDOM", "SWEDEN", "PORTUGAL",
+				 "FINLAND", "SPAIN", "NETHERLANDS", "GERMANY", "SWITZERLAND", "FRANCE",
+				 "BELGIUM", "ITALY" };
 		for (String country : foreign_countries) {
+			System.out.println("Scrapping "+country+" jobs ............................");
 			if (Arrays.asList(countries_set1).contains(country)) {
 				System.out.println(country);
-
+				int maxNumberOfPagesClicked = 2;
 				try {
 					int jobIndex = 0;
 					boolean isFinalPageReached = false;
@@ -176,14 +205,12 @@ public class AltenJobCollector {
 								continue;
 							}
 						}
-						// break from while loop
 
 						try {
 							List<WebElement> btnList = driver.findElements(
 									By.cssSelector("div.col-lg-8.wp-block-bootstrap-column div nav ul li"));
 
 							if (btnList.isEmpty()) {
-								System.out.println("*********************************************************");
 								isFinalPageReached = true;
 							} else {
 								for (int i = 0; i < btnList.size(); i++) {
@@ -194,8 +221,13 @@ public class AltenJobCollector {
 										if (i + 1 < btnList.size()) {
 											WebElement nextBtn = btnList.get(i + 1);
 											safeClick(driver, nextBtn);
+											maxNumberOfPagesClicked--;
+											if(isFullJobsCollection == false && maxNumberOfPagesClicked == 0) {
+												isFinalPageReached = true;
+											}
+											
 										} else {
-											isFinalPageReached = true; // active button is last page
+											isFinalPageReached = true;
 										}
 										break;
 									}
@@ -208,7 +240,6 @@ public class AltenJobCollector {
 						}
 					}
 
-					// extract jobs full post
 					try {
 						for (int id = 0; id < id_jobInfo.size(); id++) {
 							driver.get(jobsLinks.get(id));
@@ -220,26 +251,27 @@ public class AltenJobCollector {
 								List<WebElement> elements = driver
 										.findElements(By.cssSelector(".mb-5.wp-block-jobboard-offer-meta"));
 								if (!elements.isEmpty()) {
-									return elements; // return if found
+									return elements;
 								}
 								elements = driver.findElements(By.cssSelector(".my-0.wp-block-jobboard-offer-meta"));
 								if (!elements.isEmpty()) {
 									return elements.subList(1, 3);
 								}
-								return null; // keep waiting
+								return null;
 							});
 
 							String innerHTML = "";
 							for (WebElement element : divPost) {
 								innerHTML = innerHTML + element.getDomProperty("innerHTML") + "\n";
 							}
-							innerHTML = innerHTML.stripTrailing();
+							innerHTML = innerHTML.stripTrailing().replace("\n", "");
+							innerHTML = innerHTML.replaceAll("\\s{2,}", " ");
 
 							// retrieving direct link to apply for the offer
 							WebElement applyBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By
 									.cssSelector("div.mx-md-2.is-style-button-blue.wp-block-jobboard-offer-action a")));
 							String applyLink = applyBtn.getDomAttribute("href");
-							System.out.println("the innerHTML is : " + innerHTML.replace("\n", ""));
+							//System.out.println("the innerHTML is : " + innerHTML);
 							System.out.println("the apply link is : " + applyLink);
 
 							JobsOffers jobOffer = new JobsOffers();
@@ -253,7 +285,10 @@ public class AltenJobCollector {
 							jobOffer.setPost(innerHTML);
 
 							if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
-									id_jobInfo.get(id).getFirst(), "Alten", id_jobInfo.get(id).get(1), applyLink)) {
+									id_jobInfo.get(id).getFirst(), 
+									"Alten", 
+									id_jobInfo.get(id).get(1), 
+									applyLink)) {
 								try {
 									jobsOffersRepository.save(jobOffer);
 								} catch (DataIntegrityViolationException e) {
@@ -353,7 +388,10 @@ public class AltenJobCollector {
 						jobOffer.setPost(jobPostInnerHTML);
 
 						if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
-								id_jobInfo.get(id).getFirst(), "Alten", id_jobInfo.get(id).get(1), applyLink)) {
+								id_jobInfo.get(id).getFirst(), 
+								"Alten", 
+								id_jobInfo.get(id).get(1), 
+								applyLink)) {
 							try {
 								jobsOffersRepository.save(jobOffer);
 							} catch (DataIntegrityViolationException e) {
@@ -363,7 +401,10 @@ public class AltenJobCollector {
 					}
 
 				} catch (Exception e) {
-					// TODO: handle exception
+					String message = (e.getMessage() != null) ? e.getMessage().split("\n")[0] : "No message";
+					logger.log(Level.WARNING,
+							"[" + AltenJobCollector.class.getName() + "]" + " Failed at " + country + ": " + message,e);
+					continue;
 				}
 
 			}
@@ -371,15 +412,13 @@ public class AltenJobCollector {
 	}
 
 	public void getForeignJobs_3() {
+		System.out.println("Scrapping INDIA jobs ............................");
 		Set<String> foreign_countries = ALTEN_COUNTRIES_LINK.keySet();
 		String[] countries_set2 = { "INDIA" };
 		for (String country : foreign_countries) {
 			if (Arrays.asList(countries_set2).contains(country)) {
 				System.out.println(country);
 				try {
-					int jobIndex = 0;
-					HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
-					HashMap<Integer, String> jobsLinks = new HashMap<>();
 					driver.get(ALTEN_COUNTRIES_LINK.get(country));
 					WebElement careersLink = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(
 							"#join-us div.row.row-cols-1.row-cols-md-2.justify-content-center.wp-block-bootstrap-row a.card-inner.text-decoration-none")));
@@ -424,8 +463,10 @@ public class AltenJobCollector {
 							WebElement post = wait.until(ExpectedConditions.presenceOfNestedElementLocatedBy(job,
 									By.cssSelector("div.accordion-collapse.collapse.show")));
 							String job_title = title.getText();
-							String jobPostInnerHTML = post.getDomProperty("innerHTML").replace("\n", "");
-							System.out.println(jobPostInnerHTML);
+							String jobPostInnerHTML = post.getDomProperty("innerHTML")
+														  .replace("\n", "")
+														  .replaceAll("\\s{2,}", " ");
+							//System.out.println(jobPostInnerHTML);
 
 							JobsOffers jobOffer = new JobsOffers();
 							jobOffer.setTitle(job_title);
@@ -437,8 +478,11 @@ public class AltenJobCollector {
 							jobOffer.setPublishDate("N/A");
 							jobOffer.setPost(jobPostInnerHTML);
 
-							if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(job_title, "Alten",
-									"India", "N/A")) {
+							if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+									job_title, 
+									"Alten",
+									"India", 
+									"N/A")) {
 								try {
 									jobsOffersRepository.save(jobOffer);
 								} catch (DataIntegrityViolationException e) {
@@ -456,18 +500,24 @@ public class AltenJobCollector {
 					}
 
 				} catch (Exception e) {
-					// TODO: handle exception
+					String message = (e.getMessage() != null) ? e.getMessage().split("\n")[0] : "No message";
+					logger.log(Level.WARNING,
+							"[" + AltenJobCollector.class.getName() + "]" + " Failed at " + country + ": " + message,e);
+					continue;
 				}
 
 			}
 		}
 	}
 
-	public void getMoroccanJobs() {
+	public void getMoroccanJobs(boolean isFullJobsCollection) {
+		System.out.println("Scrapping Moroccan jobs ............................");
 		Set<String> list_countries = ALTEN_COUNTRIES_LINK.keySet();
 		String[] countries_set = { "MOROCCO" };
+		
 		for (String country : list_countries) {
 			if (Arrays.asList(countries_set).contains(country)) {
+				int maxNumberOfPagesClicked = 3;
 				System.out.println(country);
 				int jobIndex = 0;
 				boolean isFinalPageReached = false;
@@ -517,7 +567,6 @@ public class AltenJobCollector {
 
 						System.out.println("\n" + btnList.size());
 						if (btnList.isEmpty()) {
-							System.out.println("*********************************************************");
 							isFinalPageReached = true;
 						} else {
 							for (int i = 0; i < btnList.size(); i++) {
@@ -527,6 +576,10 @@ public class AltenJobCollector {
 									if (i + 1 < btnList.size()) {
 										WebElement nextBtn = btnList.get(i + 1);
 										safeClick(driver, nextBtn);
+										maxNumberOfPagesClicked--;
+										if(isFullJobsCollection == false && maxNumberOfPagesClicked == 0) {
+											isFinalPageReached = true;
+										}
 										System.out.println("page clicked");
 										wait.until(ExpectedConditions.stalenessOf(jobs.getFirst()));
 									} else {
@@ -535,10 +588,7 @@ public class AltenJobCollector {
 									break;
 								}
 							}
-						}
-//
-//						
-//						
+						}						
 					}
 
 					for (int id = 0; id < jobsLinks.size(); id++) {
@@ -551,14 +601,39 @@ public class AltenJobCollector {
 						}
 						
 						String apply_link = driver.findElement(
-								By.cssSelector(".mx-md-2.is-style-button-blue.wp-block-jobboard-offer-action a")
-							).getDomAttribute("href");
-						System.out.println("\n\n" + "  " + id + "  :  " + innerHTML);
+							By.cssSelector(".mx-md-2.is-style-button-blue.wp-block-jobboard-offer-action a")
+						).getDomAttribute("href");
+						
+						JobsOffers jobOffer = new JobsOffers();
+		                jobOffer.setTitle(id_jobInfo.get(id).getFirst());
+		                jobOffer.setCompany("Alten");
+		                jobOffer.setLocation(id_jobInfo.get(id).get(1));
+		                jobOffer.setUrl(apply_link);
+		                jobOffer.setContractType(id_jobInfo.get(id).get(2));
+		                jobOffer.setWorkMode(id_jobInfo.get(id).get(3));
+		                jobOffer.setPublishDate(id_jobInfo.get(id).get(4));
+		                jobOffer.setPost(innerHTML);
+
+						if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+								id_jobInfo.get(id).getFirst(), 
+								"Alten",
+								"India", 
+								"N/A")) {
+							try {
+								jobsOffersRepository.save(jobOffer);
+							} catch (DataIntegrityViolationException e) {
+								logger.info(
+										"Duplicate detected: " + jobOffer.getTitle() + " @ " + jobOffer.getUrl());
+							}
+						}
+						//System.out.println("\n\n" + "  " + id + "  :  " + innerHTML);
 					}
 
 				} catch (Exception e) {
-					// TODO: handle exception
-					e.printStackTrace();
+					String message = (e.getMessage() != null) ? e.getMessage().split("\n")[0] : "No message";
+					logger.log(Level.WARNING,
+							"[" + AltenJobCollector.class.getName() + "]" + " Failed at " + country + ": " + message,e);
+					continue;
 				}
 
 			}
