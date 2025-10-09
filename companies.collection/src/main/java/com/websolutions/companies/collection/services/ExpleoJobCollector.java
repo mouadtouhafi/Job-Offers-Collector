@@ -32,7 +32,6 @@ public class ExpleoJobCollector {
     private final HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
     private final HashMap<Integer, String> jobsLinks = new HashMap<>();
     private final JobsOffersRepository jobsOffersRepository;
-    private WebDriver driver;
     private boolean isFinalPageReached = false;
     private int maxNumberOfPagesClicked = 1;
 	private EdgeOptions options;
@@ -51,8 +50,9 @@ public class ExpleoJobCollector {
 		options.addArguments("--lang=en-US");
         options.addArguments("--disable-gpu");
         options.addArguments("--disable-notifications");
+        options.addArguments("--window-size=1920,1080");
 		
-        driver = new RemoteWebDriver(
+        WebDriver driver = new RemoteWebDriver(
         		URI.create("http://selenium:4444").toURL(),
         	    options
         	);
@@ -273,7 +273,7 @@ public class ExpleoJobCollector {
 			System.out.println("Error: " + e.getMessage());
 
 		} finally {
-			closeDriver();
+			driver.quit();
 		}
     }
 
@@ -296,10 +296,5 @@ public class ExpleoJobCollector {
          } catch (Exception ex) {
              System.out.println("Error clicking element: " + ex.getMessage());
          }
-     }
-     
-     
-     private void closeDriver(){
-         driver.quit();
      }
 }
