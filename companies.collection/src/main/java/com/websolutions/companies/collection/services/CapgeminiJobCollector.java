@@ -107,7 +107,7 @@ public class CapgeminiJobCollector {
 
 		for (int id = 0; id < jobsLinks.size(); id++) {
 			try {
-				driver.get(jobsLinks.get(id));
+				driver.get("https://www.capgemini.com"+jobsLinks.get(id));
 				String innerHTML = "";
 				WebElement innerHTMLContainer = wait.until(ExpectedConditions
 						.presenceOfElementLocated(By.cssSelector("section.section--job-info div.article-text")));
