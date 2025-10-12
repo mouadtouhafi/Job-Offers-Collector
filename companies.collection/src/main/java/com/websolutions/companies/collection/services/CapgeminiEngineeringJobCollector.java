@@ -156,7 +156,7 @@ public class CapgeminiEngineeringJobCollector {
 				}
             }
 		}
-
+		driver.quit();
 	}
 
 	public void safeClick(WebDriver driver, WebElement element) {

@@ -25,7 +25,7 @@ import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
 @Service
-public class CageminiJobCollector {
+public class CapgeminiJobCollector {
 	private String capgeminiLinkPart = "https://www.capgemini.com/careers/join-capgemini/job-search/?size=";
 	
 	private static final Logger logger = Logger.getLogger(ExpleoJobCollector.class.getName());
@@ -36,7 +36,7 @@ public class CageminiJobCollector {
     boolean isFinalPageReached = false;
 
   
-	public CageminiJobCollector(JobsOffersRepository jobsOffersRepository) {
+	public CapgeminiJobCollector(JobsOffersRepository jobsOffersRepository) {
 		super();
 		this.jobsOffersRepository = jobsOffersRepository;
 	}
