@@ -201,7 +201,7 @@ public class ApsideJobCollector {
 						  .getDomProperty("innerHTML").replace("\n", "");
 				
 				String innerHTML = innerHTMLMissions + innerHTMLQualifications;
-				System.out.println(innerHTML);
+				//System.out.println(innerHTML);
 				
 			
 				String apply_link = jobsLinks.get(id);
@@ -236,7 +236,7 @@ public class ApsideJobCollector {
 			}
 			
 		}
-//		driver.quit();
+		driver.quit();
 		
 		
 	}
