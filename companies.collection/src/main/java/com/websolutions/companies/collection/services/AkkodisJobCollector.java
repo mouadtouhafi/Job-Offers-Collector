@@ -65,7 +65,6 @@ public class AkkodisJobCollector {
         	    options
         	);
 		
-		driver = new EdgeDriver(options);
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 		driver.get(AkkodisLink);
