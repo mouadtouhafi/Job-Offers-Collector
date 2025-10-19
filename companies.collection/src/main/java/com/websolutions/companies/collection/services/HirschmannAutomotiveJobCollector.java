@@ -68,48 +68,39 @@ public class HirschmannAutomotiveJobCollector {
 		boolean popupAppearedAndClosed = false;
 		if (!popupAppearedAndClosed) {
 			/*
-			 * the Usercentrics cookie banner is rendered inside a shadow DOM, and it often
-			 * re-renders dynamically after the page loads. This causes Selenium to throw a
-			 * StaleElementReferenceException because the reference to the button becomes
-			 * invalid once the DOM refreshes. The solution is twofold: first, explicitly
-			 * wait for the shadow host (id="usercentrics-root") to be present; second, each
-			 * time we need to interact with elements inside it, re-fetch the shadow root
-			 * and the target element instead of reusing old references. By combining a
-			 * short retry loop with JavascriptExecutor to access the shadow DOM, we ensure
-			 * Selenium always interacts with the most up-to-date element, which prevents
-			 * the stale element error and allows the “Accept All” button to be clicked
-			 * reliably.
+			 * This part of the code handles closing the cookie consent popup that appears when opening the Hirschmann Automotive website. 
+			 * Because the popup is built inside a shadow DOM (a hidden part of the page that Selenium can’t access directly), 
+			 * normal element selection doesn’t work. 
+			 * To solve this, the code uses a JavaScriptExecutor to repeatedly check if the popup and its “Accept All” button exist 
+			 * inside the shadow DOM. 
+			 * Once the button is found, it clicks it using JavaScript instead of the regular Selenium click method, 
+			 * ensuring the popup closes reliably. 
+			 * If the popup doesn’t appear within 15 seconds, the code safely skips it and continues without crashing.
 			 */
 			try {
-				JavascriptExecutor js = (JavascriptExecutor) driver;
+			    JavascriptExecutor js = (JavascriptExecutor) driver;
 
-				WebElement cookieBannerRoot = wait
-						.until(ExpectedConditions.presenceOfElementLocated(By.id("usercentrics-root")));
+			    WebElement acceptAllButton = new WebDriverWait(driver, Duration.ofSeconds(15))
+			            .until(driver1 -> {
+			                Object button = js.executeScript("""
+			                    const host = document.querySelector('#usercentrics-root');
+			                    if (!host || !host.shadowRoot) return null;
+			                    return host.shadowRoot.querySelector("button[data-testid='uc-accept-all-button']");
+			                """);
+			                return (WebElement) button;
+			            });
 
-				// Retry logic to handle stale elements
-				for (int i = 0; i < 3; i++) {
-					try {
-						// Get fresh shadowRoot each time
-						SearchContext shadowRoot = (SearchContext) js.executeScript("return arguments[0].shadowRoot",
-								cookieBannerRoot);
-
-						// Find the button fresh
-						WebElement acceptAllButton = shadowRoot
-								.findElement(By.cssSelector("button[data-testid='uc-accept-all-button']"));
-
-						// Click it
-						acceptAllButton.click();
-						System.out.println("Clicked Accept All");
-						break; // exit loop if successful
-					} catch (StaleElementReferenceException e) {
-						System.out.println("Stale element, retrying... " + (i + 1));
-						Thread.sleep(500); // short pause before retry
-					}
-				}
+			    if (acceptAllButton != null) {
+			        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", acceptAllButton);
+			        System.out.println("✅ Accepted cookies via JS click");
+			    } else {
+			        System.out.println("⚠️ Accept All button not found even after wait");
+			    }
 
 			} catch (TimeoutException e) {
-				e.printStackTrace();
+			    System.out.println("⚠️ No cookie popup found within timeout, continuing...");
 			}
+
 			popupAppearedAndClosed = true;
 		}
 
