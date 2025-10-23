@@ -150,7 +150,7 @@ public class LearJobCollection {
 				String location = extraInfosContainer.get(2).findElement(By.cssSelector("div.row span:nth-child(2)")).getText();
 				String job_domain = extraInfosContainer.get(3).findElement(By.cssSelector("div.row span:nth-child(2)")).getText();
 				
-				String apply_link = "https://jobs.avl.com" + driver.findElement(
+				String apply_link = "https://jobs.lear.com" + driver.findElement(
 						By.cssSelector("div.applylink a.btn-primary"))
 						.getDomAttribute("href");
 					
