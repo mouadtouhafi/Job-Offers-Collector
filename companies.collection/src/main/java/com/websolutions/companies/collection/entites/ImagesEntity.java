@@ -14,7 +14,7 @@ public class ImagesEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long id; 
 	
 	private String name;
 	
@@ -27,9 +27,8 @@ public class ImagesEntity {
 	public ImagesEntity() {
 	}
 	
-	public ImagesEntity(Long id, String name, String type, byte[] data) {
+	public ImagesEntity(String name, String type, byte[] data) {
 		super();
-		this.id = id;
 		this.name = name;
 		this.type = type;
 		this.data = data;
