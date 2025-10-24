@@ -21,7 +21,7 @@ public class ImagesEntity {
 	private String type;
 	
 	@Lob
-	@Column(columnDefinition = "LONGBLOB")
+	@Column(name = "data")
 	private byte[] data;
 
 	public ImagesEntity() {
