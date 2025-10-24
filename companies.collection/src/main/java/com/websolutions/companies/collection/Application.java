@@ -1,46 +1,36 @@
 package com.websolutions.companies.collection;
 
+import java.io.IOException;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.websolutions.companies.collection.services.AkkodisJobCollector;
 import com.websolutions.companies.collection.services.AltenJobCollector;
+import com.websolutions.companies.collection.services.ApsideJobCollector;
 import com.websolutions.companies.collection.services.AvlJobCollector;
+import com.websolutions.companies.collection.services.CapgeminiEngineeringJobCollector;
+import com.websolutions.companies.collection.services.CapgeminiJobCollector;
+import com.websolutions.companies.collection.services.DevoteamJobCollector;
 import com.websolutions.companies.collection.services.ExpleoJobCollector;
 import com.websolutions.companies.collection.services.HirschmannAutomotiveJobCollector;
-import com.websolutions.companies.collection.services.InetumJobCollector;
-import com.websolutions.companies.collection.services.LearJobCollection;
-import com.websolutions.companies.collection.services.StellantisJobCollector;
+import com.websolutions.companies.collection.services.repositories.ImportImagesService;
 
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
-    private final ExpleoJobCollector expleoJobCollector;
-    private final AltenJobCollector altenJobCollector;
+	private final ImportImagesService importImagesService;
+	
+    private final CapgeminiEngineeringJobCollector capgeminiJobCollector;
     private final AvlJobCollector avlJobCollector;
-    private final LearJobCollection learJobCollection;
-    private final AkkodisJobCollector akkodisJobCollector;
-    private final StellantisJobCollector stellantisJobCollector;
     private final HirschmannAutomotiveJobCollector hirschmannAutomotiveJobCollector;
-    private final InetumJobCollector inetumJobCollector;
 
-    public Application(ExpleoJobCollector expleoJobCollector, 
-    				   AltenJobCollector altenJobCollector, 
-    				   AvlJobCollector avlJobCollector,
-    				   LearJobCollection learJobCollection,
-    				   AkkodisJobCollector akkodisJobCollector,
-    				   StellantisJobCollector stellantisJobCollector,
-    				   HirschmannAutomotiveJobCollector hirschmannAutomotiveJobCollector,
-    				   InetumJobCollector inetumJobCollector) {
-        this.expleoJobCollector = expleoJobCollector;
-        this.altenJobCollector = altenJobCollector;
+    public Application(ImportImagesService importImagesService, CapgeminiEngineeringJobCollector capgeminiJobCollector, AvlJobCollector avlJobCollector, HirschmannAutomotiveJobCollector hirschmannAutomotiveJobCollector) {
+        this.importImagesService = importImagesService;
+    	this.capgeminiJobCollector = capgeminiJobCollector;
         this.avlJobCollector = avlJobCollector;
-        this.learJobCollection = learJobCollection;
-        this.akkodisJobCollector = akkodisJobCollector;
-        this.stellantisJobCollector = stellantisJobCollector;
         this.hirschmannAutomotiveJobCollector = hirschmannAutomotiveJobCollector;
-        this.inetumJobCollector = inetumJobCollector;
     }
 
     public static void main(String[] args) {
@@ -48,25 +38,13 @@ public class Application implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws InterruptedException {
-        //expleoJobCollector.scrapeJobs();
+    public void run(String... args) throws Exception {
+    	String folderPath = "/resources/Logos";
+    	importImagesService.loadImages(folderPath);
     	
-//        altenJobCollector.getCountries();
-////        altenJobCollector.getForeignJobs_1();
-////        altenJobCollector.getForeignJobs_2();
-//        altenJobCollector.getForeignJobs_3();
-//        altenJobCollector.closeDriver();
-    	
-//    	avlJobCollector.getFulljobs();
-    	
-//    	learJobCollection.getFulljobs();
-    	
-//    	akkodisJobCollector.getFulljobs();
-    	
-//    	stellantisJobCollector.getFulljobs();
-    	
-//    	hirschmannAutomotiveJobCollector.getFulljobs();
-    	
-    	inetumJobCollector.getFulljobs(true);
+    	//capgeminiEngineeringJobCollector.getMoroccanJobs(false);
+//    	capgeminiJobCollector.getMoroccanJobs(false);
+//    	avlJobCollector.getFulljobs(false);
+    	hirschmannAutomotiveJobCollector.getFulljobs(false);
     }
 }
