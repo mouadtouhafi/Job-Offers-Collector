@@ -39,8 +39,8 @@ public class Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-    	String folderPath = "/resources/Logos";
-    	importImagesService.loadImages(folderPath);
+
+    	importImagesService.loadImages("Logos");
     	
     	//capgeminiEngineeringJobCollector.getMoroccanJobs(false);
 //    	capgeminiJobCollector.getMoroccanJobs(false);
