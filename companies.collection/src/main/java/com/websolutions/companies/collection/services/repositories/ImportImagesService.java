@@ -28,11 +28,13 @@ public class ImportImagesService {
 		for(Resource resource : resources) {
 			try (InputStream is = resource.getInputStream()){
 				byte[] data = is.readAllBytes();
-				String fileName = resource.getFilename();
+				String fileName = resource.getFilename().split("\\.")[0];
 				String fileType = fileName.endsWith(".png") ? "image/png" : "image/jpeg";
 				
 				ImagesEntity image = new ImagesEntity(fileName, fileType, data);
-				imagesRepository.save(image);
+				if(!imagesRepository.existsByName(fileName)) {
+					imagesRepository.save(image);
+				}
 			}
 		}
 		
