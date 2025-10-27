@@ -41,6 +41,7 @@ public class Application implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
     	importImagesService.loadImages("Logos");
+    	importImagesService.loadFlags("Flags");
     	
     	//capgeminiEngineeringJobCollector.getMoroccanJobs(false);
 //    	capgeminiJobCollector.getMoroccanJobs(false);
