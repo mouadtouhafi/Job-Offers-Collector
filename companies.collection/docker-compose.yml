@@ -12,6 +12,8 @@ services:
     depends_on:
       - postgres
       - selenium
+    networks:
+      - shared-network
 
   postgres:
     image: postgres:16
@@ -25,12 +27,20 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - shared-network
 
   selenium:
     image: selenium/standalone-edge:latest
     container_name: selenium
     ports:
       - "4444:4444"
+    networks:
+      - shared-network
 
 volumes:
   pgdata:
+
+networks:
+  shared-network:
+    external: true
