@@ -6,6 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.websolutions.companies.collection.modelAI.PredictTitle;
+import com.websolutions.companies.collection.modelAI.TrainAndSave;
 import com.websolutions.companies.collection.services.AkkodisJobCollector;
 import com.websolutions.companies.collection.services.AltenJobCollector;
 import com.websolutions.companies.collection.services.ApsideJobCollector;
@@ -25,12 +27,15 @@ public class Application implements CommandLineRunner {
     private final CapgeminiEngineeringJobCollector capgeminiJobCollector;
     private final AvlJobCollector avlJobCollector;
     private final HirschmannAutomotiveJobCollector hirschmannAutomotiveJobCollector;
+    
+    private final TrainAndSave trainAndSave;
 
-    public Application(ImportImagesService importImagesService, CapgeminiEngineeringJobCollector capgeminiJobCollector, AvlJobCollector avlJobCollector, HirschmannAutomotiveJobCollector hirschmannAutomotiveJobCollector) {
+    public Application(ImportImagesService importImagesService, CapgeminiEngineeringJobCollector capgeminiJobCollector, AvlJobCollector avlJobCollector, HirschmannAutomotiveJobCollector hirschmannAutomotiveJobCollector, TrainAndSave trainAndSave) {
         this.importImagesService = importImagesService;
     	this.capgeminiJobCollector = capgeminiJobCollector;
         this.avlJobCollector = avlJobCollector;
         this.hirschmannAutomotiveJobCollector = hirschmannAutomotiveJobCollector;
+        this.trainAndSave = trainAndSave;
     }
 
     public static void main(String[] args) {
@@ -39,13 +44,17 @@ public class Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+    	
+    	trainAndSave.trainData();
+    	System.out.println(" ---------------------------------------------- ");
+    	new PredictTitle().predictField("Diagnostic automotive engineer");
 
-    	importImagesService.loadImages("Logos");
-    	importImagesService.loadFlags("Flags");
+    	//importImagesService.loadImages("Logos");
+    	//importImagesService.loadFlags("Flags");
     	
     	//capgeminiEngineeringJobCollector.getMoroccanJobs(false);
 //    	capgeminiJobCollector.getMoroccanJobs(false);
 //    	avlJobCollector.getFulljobs(false);
-    	hirschmannAutomotiveJobCollector.getFulljobs(false);
+    	//hirschmannAutomotiveJobCollector.getFulljobs(false);
     }
 }
