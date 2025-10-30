@@ -8,5 +8,7 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre
 WORKDIR /collection-app
 COPY --from=build /collection-app/target/companies.collection-0.0.1-SNAPSHOT.jar collection-app.jar
+# Copy models folder (with jobs.csv)
+COPY --from=build /collection-app/models /collection-app/models
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "collection-app.jar"]
