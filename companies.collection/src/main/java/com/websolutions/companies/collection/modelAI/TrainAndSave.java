@@ -32,14 +32,9 @@ public class TrainAndSave {
         /*
          * Here, the program specifies two paths:
          * 	csvPath: the location of the dataset (a CSV file with job data).
-         * 	modelPath: where to save the trained model after training.
+         * 	modelPath: where to save the trained model after training (at the very bottom).
          * */
-        //String csvPath = "C:\\Users\\touhafi\\Downloads\\jobs.csv";
-    	Path csvPath = Paths.get(
-    	        TrainAndSave.class
-    	        .getResource("/Files/jobs.csv")
-    	        .toURI()
-    	);
+    	Path csvPath = Paths.get("models/jobs.csv");
     	
         
         /* Loading all labeled examples from our CSV */
