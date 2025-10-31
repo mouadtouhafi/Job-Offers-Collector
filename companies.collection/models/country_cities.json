@@ -1,0 +1,7 @@
+{
+  "China" : [ "Canton" ],
+  "Czechia" : [ "Carlsbad" ],
+  "France" : [ "BORDEAUX", "LYON", "MONTPELLIER", "NANTES", "STRASBOURG" ],
+  "Sweden" : [ "Göteborg", "Jönköping", "Linköping", "Ludvika", "Lund", "Stockholm", "Västerås", "Örebro" ],
+  "United States" : [ "Andover", "Bothell", "Carrollton", "Charlotte", "Chicago", "Newark", "Pennington", "Plano", "Rochester", "San jose", "Seattle", "St. louis", "Stamford", "Victor" ]
+}
