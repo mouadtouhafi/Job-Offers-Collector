@@ -37,7 +37,7 @@ public class CityToCountry {
 	 * USER_AGENT: a short “signature” that identifies your program to that website.
 	 * */
     private static final String NOMINATIM_BASE = "https://nominatim.openstreetmap.org/search";
-    private static final String USER_AGENT = "jobs-web/1.0 (contact: mouad-thf2@example.com)";
+    private static final String USER_AGENT = "jobs-web/1.0 (contact: mouad-thf3@example.com)";
     
     
     /*
