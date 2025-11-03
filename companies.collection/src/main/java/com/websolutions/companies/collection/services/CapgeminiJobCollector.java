@@ -34,7 +34,6 @@ public class CapgeminiJobCollector {
     private final JobsOffersRepository jobsOffersRepository;
     private EdgeOptions options;
     boolean isFinalPageReached = false;
-
   
 	public CapgeminiJobCollector(JobsOffersRepository jobsOffersRepository) {
 		super();
@@ -87,15 +86,17 @@ public class CapgeminiJobCollector {
 			List<WebElement> job_details = job.findElements(By.cssSelector(".table-td"));
 			String job_title = job_details.get(0).findElement(By.tagName("div")).getText();
 			String country = job_details.get(1).findElement(By.tagName("div")).getText();
-			String location = job_details.get(2).findElement(By.tagName("div")).getText();
+			String city = job_details.get(2).findElement(By.tagName("div")).getText();
 			String contract_type = job_details.get(5).findElement(By.tagName("div")).getText();
 			String job_link = job.getDomAttribute("href");
 			System.out.println(
-					job_title + "  |  " + country + "  |  " + location + "  |  " + contract_type + "  |  " + job_link);
+					job_title + "  |  " + country + "  |  " + city + "  |  " + contract_type + "  |  " + job_link);
 
+			
 			List<String> infos = new ArrayList<>();
 			infos.add(job_title.strip());
-			infos.add(country.strip().replace("\n", ", ") + " " + location.strip().replace("\n", ", "));
+			infos.add(city.strip().replace("\n", ", "));
+			infos.add(country.strip().replace("\n", ", "));
 			infos.add(contract_type.strip());
 			infos.add("N/A");
 			infos.add("N/A");
@@ -122,16 +123,18 @@ public class CapgeminiJobCollector {
 				JobsOffers jobOffer = new JobsOffers();
                 jobOffer.setTitle(id_jobInfo.get(id).getFirst());
                 jobOffer.setCompany("Capgemini");
-                jobOffer.setLocation(id_jobInfo.get(id).get(1));
+                jobOffer.setCity(id_jobInfo.get(id).get(1));
+                jobOffer.setCountry(id_jobInfo.get(id).get(2));
                 jobOffer.setUrl(apply_link);
-                jobOffer.setContractType(id_jobInfo.get(id).get(2));
+                jobOffer.setContractType(id_jobInfo.get(id).get(3));
                 jobOffer.setWorkMode("N/A");
                 jobOffer.setPublishDate("N/A");
                 jobOffer.setPost(innerHTML);
-                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 
                 		"Capgemini", 
                 		id_jobInfo.get(id).get(1), 
+                		id_jobInfo.get(id).get(2), 
                 		apply_link)){
                 	
                 	try {
