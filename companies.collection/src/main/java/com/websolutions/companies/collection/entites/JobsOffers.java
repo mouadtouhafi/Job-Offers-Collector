@@ -37,7 +37,8 @@ public class JobsOffers {
 	
 	private String title;
     private String company;
-    private String location;
+    private String city;
+    private String country;
     private String url;
     private String contractType;
     private String workMode;
@@ -58,13 +59,14 @@ public class JobsOffers {
     	
     }
     
-	public JobsOffers(Long id, String title, String company, String location, String url, String contractType,
+	public JobsOffers(Long id, String title, String company, String city, String country, String url, String contractType,
 			String workMode, String publishDate, String post) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.company = company;
-		this.location = location;
+		this.city = city;
+		this.country = country;
 		this.url = url;
 		this.contractType = contractType;
 		this.workMode = workMode;
@@ -96,12 +98,20 @@ public class JobsOffers {
 		this.company = company;
 	}
 
-	public String getLocation() {
-		return location;
+	public String getCity() {
+		return city;
 	}
 
-	public void setLocation(String location) {
-		this.location = location;
+	public void setCity(String city) {
+		this.city = city;
+	}
+	
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
 	}
 
 	public String getUrl() {
