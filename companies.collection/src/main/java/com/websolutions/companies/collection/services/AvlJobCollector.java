@@ -1,6 +1,6 @@
 package com.websolutions.companies.collection.services;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -26,6 +29,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
+import com.websolutions.companies.collection.locations.DetectCities;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
 @Service
@@ -35,17 +39,19 @@ public class AvlJobCollector {
     private final HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
     private final HashMap<Integer, String> jobsLinks = new HashMap<>();
     private final JobsOffersRepository jobsOffersRepository;
+    private final DetectCities detectCities;
     private WebDriver driver;
     private EdgeOptions options;
     private int maxNumberOfPagesClicked = 3;
     private boolean isFinalPageReached = false;
     private String AvlLink = "https://jobs.avl.com/search/?createNewAlert=false&q=&locationsearch=";
     
-	public AvlJobCollector(JobsOffersRepository jobsOffersRepository) {
+	public AvlJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities) {
         this.jobsOffersRepository = jobsOffersRepository;
+        this.detectCities = detectCities;
     }
 	
-	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
+	public void getFulljobs(boolean isFullJobsCollection) throws IOException, InterruptedException {
 		int jobIndex = 0;
 		options = new EdgeOptions();
         options.addArguments("--no-sandbox");
@@ -90,12 +96,23 @@ public class AvlJobCollector {
 						   job.findElement(By.cssSelector("td.colTitle span.jobTitle a"))
 						   .getDomAttribute("href");
 				
-				
+				String city = "N/A";
+				String country = "N/A";
+				Pattern pattern = Pattern.compile("^(.+?),\\s*[A-Z]{2}$");
+				Matcher matcher = pattern.matcher(location);
+				if(matcher.find()) {
+					city = matcher.group(1).strip();
+					Optional<String> detectedCountry = detectCities.getCountryForCity(city);
+					if(detectedCountry.isPresent()) {
+						country = detectedCountry.get();
+					}
+				}
 				
 				if(dateCheckValabilityStatus(date_formatter(publish_date))) {
 					List<String> infos = new ArrayList<>();
 					infos.add(job_title.strip() + " - " + job_domain.strip());
-					infos.add(location.strip().replace("\n", ", "));
+					infos.add(city);
+					infos.add(country);
 					infos.add(date_formatter(publish_date));
 		
 					id_jobInfo.put(jobIndex, infos);
@@ -170,16 +187,18 @@ public class AvlJobCollector {
 				JobsOffers jobOffer = new JobsOffers();
                 jobOffer.setTitle(id_jobInfo.get(id).getFirst());
                 jobOffer.setCompany("AVL");
-                jobOffer.setLocation(id_jobInfo.get(id).get(1));
+                jobOffer.setCity(id_jobInfo.get(id).get(1));
+                jobOffer.setCountry(id_jobInfo.get(id).get(2));
                 jobOffer.setUrl(apply_link);
                 jobOffer.setContractType(contract_type);
                 jobOffer.setWorkMode("N/A");
                 jobOffer.setPublishDate(id_jobInfo.get(id).get(2));
                 jobOffer.setPost(innerHTML);
-                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 
                 		"AVL", 
-                		id_jobInfo.get(id).get(1), 
+                		id_jobInfo.get(id).get(1),
+                		id_jobInfo.get(id).get(2),
                 		apply_link)){
                 	
                 	try {
