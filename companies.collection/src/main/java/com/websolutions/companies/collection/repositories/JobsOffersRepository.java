@@ -8,6 +8,6 @@ import com.websolutions.companies.collection.entites.JobsOffers;
 @Repository
 public interface JobsOffersRepository extends JpaRepository<JobsOffers, Long>{
 	
-	boolean existsByTitleAndCompanyAndLocationAndUrl(String title, String company, String location, String url);
+	boolean existsByTitleAndCompanyAndCityAndCountryAndUrl(String title, String company, String city, String country, String url);
 	
 }
