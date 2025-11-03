@@ -1,11 +1,12 @@
 package com.websolutions.companies.collection.services;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.openqa.selenium.By;
@@ -22,6 +23,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
+import com.websolutions.companies.collection.locations.DetectCities;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
 @Service
@@ -35,13 +37,15 @@ public class CapgeminiEngineeringJobCollector {
 	private String CapgeminiEngineeringLink = "https://www.capgemini.com/ma-en/job-search/?page=1&size=11&country_code=ma-en";
 	private int maxNumberOfPagesClicked = 3;
 	boolean isFinalPageReached = false;
+	private final DetectCities detectCities;
 
-	public CapgeminiEngineeringJobCollector(JobsOffersRepository jobsOffersRepository) {
+	public CapgeminiEngineeringJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities) {
 		super();
 		this.jobsOffersRepository = jobsOffersRepository;
+		this.detectCities = detectCities;
 	}
 
-	public void getMoroccanJobs(boolean isFullJobsCollection) throws MalformedURLException {
+	public void getMoroccanJobs(boolean isFullJobsCollection) throws IOException, InterruptedException {
 		int jobIndex = 0;
 
 		options = new EdgeOptions();
@@ -83,9 +87,18 @@ public class CapgeminiEngineeringJobCollector {
 
 				System.out.println(job_title + " | " + job_link + " | " + location + " | " + contract_type);
 
+				String city = "N/A";
+				String country = "N/A";
+				city = location.strip().replace("\n", ", ");
+				Optional<String> detectedCountry = detectCities.getCountryForCity(city);
+				if(detectedCountry.isPresent()) {
+					country = detectedCountry.get();
+				}
+				
 				List<String> infos = new ArrayList<>();
 				infos.add(job_title.strip());
-				infos.add(location.strip().replace("\n", ", "));
+				infos.add(city);
+				infos.add(country);
 				infos.add(contract_type.strip());
 				infos.add("N/A");
 				infos.add("N/A");
@@ -137,16 +150,18 @@ public class CapgeminiEngineeringJobCollector {
 			JobsOffers jobOffer = new JobsOffers();
             jobOffer.setTitle(id_jobInfo.get(id).getFirst());
             jobOffer.setCompany("Capgemini Engineering");
-            jobOffer.setLocation(id_jobInfo.get(id).get(1));
+            jobOffer.setCity(id_jobInfo.get(id).get(1));
+            jobOffer.setCountry(id_jobInfo.get(id).get(2));
             jobOffer.setUrl(apply_link);
             jobOffer.setContractType(id_jobInfo.get(id).get(2));
             jobOffer.setWorkMode("N/A");
             jobOffer.setPublishDate("N/A");
             jobOffer.setPost(innerHTML);
-            if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+            if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
             		id_jobInfo.get(id).getFirst(), 
             		"Capgemini Engineering", 
-            		id_jobInfo.get(id).get(1), 
+            		id_jobInfo.get(id).get(1),
+            		id_jobInfo.get(id).get(2),
             		apply_link)){
             	
             	try {
