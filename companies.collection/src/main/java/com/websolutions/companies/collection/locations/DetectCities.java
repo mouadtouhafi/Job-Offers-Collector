@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -18,6 +20,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+@Service
 public class DetectCities {
 
     private static final String NOMINATIM_BASE = "https://nominatim.openstreetmap.org/search";
@@ -65,7 +68,7 @@ public class DetectCities {
      * If not found, it calls fetchCountryFromApi to query Nominatim. 
      * When the API returns a valid result, the city and country are added to the local JSON file so future lookups are faster.
      */
-    public static Optional<String> getCountryForCity(String userCity) throws IOException, InterruptedException {
+    public Optional<String> getCountryForCity(String userCity) throws IOException, InterruptedException {
         String city = normalizeCity(userCity);
         if (city.isEmpty()) {
             System.out.println("⚠️ Empty city name received.");
