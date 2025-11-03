@@ -192,7 +192,7 @@ public class AvlJobCollector {
                 jobOffer.setUrl(apply_link);
                 jobOffer.setContractType(contract_type);
                 jobOffer.setWorkMode("N/A");
-                jobOffer.setPublishDate(id_jobInfo.get(id).get(2));
+                jobOffer.setPublishDate(id_jobInfo.get(id).get(3));
                 jobOffer.setPost(innerHTML);
                 if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 
