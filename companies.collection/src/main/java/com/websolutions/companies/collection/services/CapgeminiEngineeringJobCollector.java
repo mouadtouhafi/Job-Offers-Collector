@@ -153,7 +153,7 @@ public class CapgeminiEngineeringJobCollector {
             jobOffer.setCity(id_jobInfo.get(id).get(1));
             jobOffer.setCountry(id_jobInfo.get(id).get(2));
             jobOffer.setUrl(apply_link);
-            jobOffer.setContractType(id_jobInfo.get(id).get(2));
+            jobOffer.setContractType(id_jobInfo.get(id).get(3));
             jobOffer.setWorkMode("N/A");
             jobOffer.setPublishDate("N/A");
             jobOffer.setPost(innerHTML);
