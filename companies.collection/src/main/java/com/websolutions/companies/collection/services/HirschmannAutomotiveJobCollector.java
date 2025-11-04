@@ -13,8 +13,6 @@ import java.util.logging.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -129,11 +127,21 @@ public class HirschmannAutomotiveJobCollector {
 					String job_link = "https://career.hirschmann-automotive.com" + job.findElement(By.tagName("a")).getDomAttribute("href");
 					String job_title = job.findElement(By.cssSelector("h3")).getText();
 					String location = job.findElement(By.cssSelector("p:nth-child(3)")).getText();
+					
+					String city = "N/A";
+					String country = "N/A";
+					
+					String[] splitLocation = location.split("-");
+					if(splitLocation.length >= 2) {
+						city = splitLocation[0].strip();
+						country = splitLocation[1].strip();
+					}
 
 					System.out.println(job_link + " | " + job_title + " | " + location + " | " + key);
 					List<String> infos = new ArrayList<>();
 					infos.add(job_title.strip());
-					infos.add(location);
+					infos.add(city);
+					infos.add(country);
 
 					id_jobInfo.put(jobIndex, infos);
 					jobsLinks.put(jobIndex, job_link);
@@ -165,16 +173,18 @@ public class HirschmannAutomotiveJobCollector {
 					JobsOffers jobOffer = new JobsOffers();
 	                jobOffer.setTitle(id_jobInfo.get(id).getFirst());
 	                jobOffer.setCompany("Hirschmann Automotive");
-	                jobOffer.setLocation(id_jobInfo.get(id).get(1));
+	                jobOffer.setCity(id_jobInfo.get(id).get(1));
+	                jobOffer.setCountry(id_jobInfo.get(id).get(2));
 	                jobOffer.setUrl(apply_link);
 	                jobOffer.setContractType("N/A");
 	                jobOffer.setWorkMode("N/A");
 	                jobOffer.setPublishDate("N/A");
 	                jobOffer.setPost(innerHTML);
-	                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+	                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
 	                		id_jobInfo.get(id).getFirst(), 
 	                		"Hirschmann Automotive", 
 	                		id_jobInfo.get(id).get(1), 
+	                		id_jobInfo.get(id).get(2), 
 	                		apply_link)){
 	                	
 	                	try {
