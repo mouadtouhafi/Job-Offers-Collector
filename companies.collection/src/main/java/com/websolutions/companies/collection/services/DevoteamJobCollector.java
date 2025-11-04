@@ -143,6 +143,15 @@ public class DevoteamJobCollector {
 				String location = wait.until(ExpectedConditions.presenceOfElementLocated(
 								By.cssSelector("div.wp-block-acf-post-header div.wp-block-group p")))
 								.getText().strip();
+				
+				String city = "N/A";
+				String country = "N/A";
+				
+				String[] splitLocation = location.split("•");
+				if(splitLocation.length >= 2) {
+					city = splitLocation[0].strip();
+					country = splitLocation[1].strip();
+				}
 				List<WebElement> innerHTMLPostElements = driver.findElements(By.cssSelector("div.entry-content.wp-block-post-content div.description"));
 				String innerHTML = "";
 				for(WebElement element : innerHTMLPostElements) {
@@ -164,16 +173,18 @@ public class DevoteamJobCollector {
 				JobsOffers jobOffer = new JobsOffers();
                 jobOffer.setTitle(id_jobInfo.get(id).getFirst());
                 jobOffer.setCompany("Devoteam");
-                jobOffer.setLocation(location);
+                jobOffer.setCity(city);
+                jobOffer.setCountry(country);
                 jobOffer.setUrl(apply_link);
                 jobOffer.setContractType(id_jobInfo.get(id).get(1));
                 jobOffer.setWorkMode("N/A");
                 jobOffer.setPublishDate("N/A");
                 jobOffer.setPost(innerHTML);
-                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 
                 		"Devoteam", 
-                		location, 
+                		city,
+                		country,
                 		apply_link)){
                 	
                 	try {
