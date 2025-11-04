@@ -1,6 +1,7 @@
 package com.websolutions.companies.collection.services;
 
-import java.net.MalformedURLException;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -25,6 +26,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
@@ -40,13 +43,15 @@ public class StellantisJobCollector {
     private boolean isFinalPageReached = false;
     private int maxNumberOfPagesClicked = 3;
     private String StellantisLink = "https://careers.stellantis.com/job-search-results/";
+    
+    ObjectMapper mapper = new ObjectMapper();
 	
 	public StellantisJobCollector(JobsOffersRepository jobsOffersRepository) {
 		super();
 		this.jobsOffersRepository = jobsOffersRepository;
 	}
 	
-	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
+	public void getFulljobs(boolean isFullJobsCollection) throws IOException {
 		int jobIndex = 0;
 		
 		options = new EdgeOptions();
@@ -66,6 +71,8 @@ public class StellantisJobCollector {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 		driver.get(StellantisLink);
+		
+		JsonNode root = mapper.readTree(new File("data-for-database/stellantis_sites.json"));
 		
 		boolean popupAppearedAndClosed = false;
 		if (!popupAppearedAndClosed) {
@@ -94,11 +101,21 @@ public class StellantisJobCollector {
 						   job.findElement(By.cssSelector("li.title div.jobTitle a"))
 						   .getDomAttribute("href");
 				
+				location = location.strip();
+				String city = "N/A";
+				String country = "N/A";
+				if(root.has(location)) {
+					JsonNode plant = root.get(location);
+					city = plant.get("city").asText();
+					country = plant.get("country").asText();
+				}
+				
 				System.out.println(job_title+"  |  "+location+"  |  "+job_link);
 				
 				List<String> infos = new ArrayList<>();
 				infos.add(job_title.strip());
-				infos.add(location.strip());
+				infos.add(city);
+				infos.add(country);
 	
 				id_jobInfo.put(jobIndex, infos);
 				jobsLinks.put(jobIndex, job_link);
@@ -172,16 +189,18 @@ public class StellantisJobCollector {
 					JobsOffers jobOffer = new JobsOffers();
 	                jobOffer.setTitle(id_jobInfo.get(id).getFirst());
 	                jobOffer.setCompany("Stellantis");
-	                jobOffer.setLocation(id_jobInfo.get(id).get(1));
+	                jobOffer.setCity(id_jobInfo.get(id).get(1));
+	                jobOffer.setCountry(id_jobInfo.get(id).get(2));
 	                jobOffer.setUrl(apply_link);
 	                jobOffer.setContractType("N/A");
 	                jobOffer.setWorkMode("N/A");
 	                jobOffer.setPublishDate(publish_date);
 	                jobOffer.setPost(innerHTML);
-	                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+	                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
 	                		id_jobInfo.get(id).getFirst(), 
 	                		"Stellantis", 
-	                		id_jobInfo.get(id).get(1), 
+	                		id_jobInfo.get(id).get(1),
+	                		id_jobInfo.get(id).get(2),
 	                		apply_link)){
 	                	
 	                	try {
