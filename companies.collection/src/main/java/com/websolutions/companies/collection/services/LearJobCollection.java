@@ -147,8 +147,17 @@ public class LearJobCollection {
 				WebElement innerHTMLElement = extraInfosContainer.get(6).findElement(By.cssSelector("div.row"));
 				innerHTML = innerHTMLElement.getDomProperty("innerHTML");
 				
-				String location = extraInfosContainer.get(2).findElement(By.cssSelector("div.row span:nth-child(2)")).getText();
+				String city = extraInfosContainer.get(1).findElement(By.cssSelector("div.row span:nth-child(2)")).getText();
+				String country = extraInfosContainer.get(2).findElement(By.cssSelector("div.row span:nth-child(2)")).getText();
+				
+				String[] splitedCity = city.split(city);
+				if(splitedCity.length >=1) {
+					city = splitedCity[0].strip();
+				}
+				
 				String job_domain = extraInfosContainer.get(3).findElement(By.cssSelector("div.row span:nth-child(2)")).getText();
+				
+				
 				
 				String apply_link = "https://jobs.lear.com" + driver.findElement(
 						By.cssSelector("div.applylink a.btn-primary"))
@@ -162,16 +171,18 @@ public class LearJobCollection {
 				JobsOffers jobOffer = new JobsOffers();
                 jobOffer.setTitle(id_jobInfo.get(id).getFirst());
                 jobOffer.setCompany("LEAR");
-                jobOffer.setLocation(location);
+                jobOffer.setCity(city);
+                jobOffer.setCountry(country);
                 jobOffer.setUrl(apply_link);
                 jobOffer.setContractType("N/A");
                 jobOffer.setWorkMode("N/A");
                 jobOffer.setPublishDate("N/A");
                 jobOffer.setPost(innerHTML);
-                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 
                 		"LEAR", 
-                		location, 
+                		city,
+                		country,
                 		apply_link)){
                 	
                 	try {
