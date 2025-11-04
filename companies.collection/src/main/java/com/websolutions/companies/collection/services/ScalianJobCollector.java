@@ -1,12 +1,15 @@
 package com.websolutions.companies.collection.services;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -23,6 +26,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
+import com.websolutions.companies.collection.locations.DetectCities;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
 @Service
@@ -37,13 +41,15 @@ public class ScalianJobCollector {
     private String ScalianLink = "https://careers.scalian.com/en/jobs?q=&options=&page=1";
     private int maxNumberOfPagesClicked = 1;
     boolean isFinalPageReached = false;
+    private final DetectCities detectCities;
 	
-	public ScalianJobCollector(JobsOffersRepository jobsOffersRepository) {
+	public ScalianJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities) {
 		super();
 		this.jobsOffersRepository = jobsOffersRepository;
+		this.detectCities = detectCities;
 	}
 	
-	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
+	public void getFulljobs(boolean isFullJobsCollection) throws IOException, InterruptedException {
 		int jobIndex = 0;
 		
 		options = new EdgeOptions();
@@ -111,11 +117,21 @@ public class ScalianJobCollector {
 				String job_link = "https://careers.scalian.com" + job.findElement(By.cssSelector("a.attrax-vacancy-tile__title")).getDomAttribute("href");
 				String domain = job.findElement(By.cssSelector("div.attrax-vacancy-tile__option-function p.attrax-vacancy-tile__item-value")).getDomProperty("innerHTML").replace("\n", "").strip();
 				
+				
+				String city = location.strip();
+				String country = "N/A";	
+				Optional<String> detectedCountry = detectCities.getCountryForCity(city);
+				if(detectedCountry.isPresent()) {
+					country = detectedCountry.get();
+				}
+				
+				
 				System.out.println(job_title +"  |  " +location+"  |  "+ contract_type+"  |  " +job_link);
 				
 				List<String> infos = new ArrayList<>();
 				infos.add(job_title.strip());
-				infos.add(location.strip());
+				infos.add(city);
+				infos.add(country);
 				infos.add(contract_type.strip());
 	
 				id_jobInfo.put(jobIndex, infos);
@@ -162,16 +178,18 @@ public class ScalianJobCollector {
 				JobsOffers jobOffer = new JobsOffers();
                 jobOffer.setTitle(id_jobInfo.get(id).getFirst());
                 jobOffer.setCompany("Scalian");
-                jobOffer.setLocation(id_jobInfo.get(id).get(1));
+                jobOffer.setCity(id_jobInfo.get(id).get(1));
+                jobOffer.setCountry(id_jobInfo.get(id).get(2));
                 jobOffer.setUrl(apply_link);
-                jobOffer.setContractType(id_jobInfo.get(id).get(2));
+                jobOffer.setContractType(id_jobInfo.get(id).get(3));
                 jobOffer.setWorkMode("N/A");
                 jobOffer.setPublishDate("N/A");
                 jobOffer.setPost(innerHTML);
-                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 
                 		"Scalian", 
                 		id_jobInfo.get(id).get(1), 
+                		id_jobInfo.get(id).get(2), 
                 		apply_link)){
                 	
                 	try {
