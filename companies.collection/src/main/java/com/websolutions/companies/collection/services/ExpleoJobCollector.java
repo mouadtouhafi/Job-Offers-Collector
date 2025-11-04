@@ -6,8 +6,11 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -23,6 +26,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
+import com.websolutions.companies.collection.locations.DetectCities;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
 @Service
@@ -35,11 +39,13 @@ public class ExpleoJobCollector {
     private boolean isFinalPageReached = false;
     private int maxNumberOfPagesClicked = 1;
 	private EdgeOptions options;
+	private final DetectCities detectCities;
 
     private String ExpleoLink = "https://expleo-jobs-fr-fr.icims.com/jobs/search?ss=1";
 
-    public ExpleoJobCollector(JobsOffersRepository jobsOffersRepository) {
+    public ExpleoJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities) {
         this.jobsOffersRepository = jobsOffersRepository;
+        this.detectCities = detectCities;
     }
 
     public void getFullFranceJobs(boolean isFullJobsCollection) throws MalformedURLException {
@@ -116,9 +122,12 @@ public class ExpleoJobCollector {
 					 */
 					List<WebElement> InfosDivs = row
 							.findElements(By.cssSelector("div.col-xs-12.additionalFields dl.iCIMS_JobHeaderGroup div"));
-					String location = "";
+					String city = "N/A";
+					String country = "N/A";
 					String contractType = "";
 					String workMode = "";
+					
+					Pattern pattern = Pattern.compile("^[A-Z]{2}-\\d{2}-(.+)$");
 					for (WebElement element : InfosDivs) {
 						WebElement dt_element = element.findElement(By.tagName("dt"));
 						WebElement dd_element = element.findElement(By.tagName("dd"));
@@ -128,7 +137,14 @@ public class ExpleoJobCollector {
 
 						switch (name.toLowerCase().stripLeading().stripTrailing()) {
 						case "job locations":
-							location = value;
+							Matcher matcher = pattern.matcher(value);
+				            if (matcher.find()) {
+				                city = matcher.group(1).strip();
+				                Optional<String> detectedCountry = detectCities.getCountryForCity(city);
+								if(detectedCountry.isPresent()) {
+									country = detectedCountry.get();
+								}
+				            }
 							break;
 						case "type d’emploi":
 							contractType = value;
@@ -143,7 +159,8 @@ public class ExpleoJobCollector {
 
 					List<String> infos = new ArrayList<>();
 					infos.add(jobTitle);
-					infos.add(location);
+					infos.add(city);
+					infos.add(country);
 					infos.add(contractType);
 					infos.add(workMode);
 					infos.add(publishDate);
@@ -152,7 +169,7 @@ public class ExpleoJobCollector {
 					jobsLinks.put(globalIndex, jobLink);
 					globalIndex++;
 					
-					System.out.println(jobTitle + " | " + location+ " | " +contractType+ " | " +workMode+ " | " +publishDate);
+					System.out.println(jobTitle + " | " +contractType+ " | " +workMode+ " | " +publishDate);
 				}
 
 				/*
@@ -238,16 +255,18 @@ public class ExpleoJobCollector {
                         JobsOffers jobOffer = new JobsOffers();
                         jobOffer.setTitle(id_jobInfo.get(i).getFirst());
                         jobOffer.setCompany("Expleo Group");
-                        jobOffer.setLocation(id_jobInfo.get(i).get(1));
+                        jobOffer.setCity(id_jobInfo.get(i).get(1));
+                        jobOffer.setCountry(id_jobInfo.get(i).get(2));
                         jobOffer.setUrl(applyLink);
-                        jobOffer.setContractType(id_jobInfo.get(i).get(2));
-                        jobOffer.setWorkMode(id_jobInfo.get(i).get(3));
-                        jobOffer.setPublishDate(id_jobInfo.get(i).get(4));
+                        jobOffer.setContractType(id_jobInfo.get(i).get(3));
+                        jobOffer.setWorkMode(id_jobInfo.get(i).get(4));
+                        jobOffer.setPublishDate(id_jobInfo.get(i).get(5));
                         jobOffer.setPost(innerHTML);
-                        if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                        if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                         		id_jobInfo.get(i).getFirst(), 
                         		"Expleo Group", 
-                        		id_jobInfo.get(i).get(1), 
+                        		id_jobInfo.get(i).get(1),
+                        		id_jobInfo.get(i).get(2),
                         		applyLink)){
                         	
                         	try {
