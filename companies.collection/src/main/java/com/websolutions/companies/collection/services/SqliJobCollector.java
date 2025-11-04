@@ -90,11 +90,21 @@ public class SqliJobCollector {
 						   job.findElement(By.cssSelector("p.title-h3 a"))
 						   .getDomAttribute("href");
 				
+				String city = "N/A";
+				String country = "N/A";
+				
+				String[] splitLocation = location.split(",");
+				if(splitLocation.length >= 2) {
+					city = splitLocation[0].strip();
+					country = splitLocation[1].strip();
+				}
+				
 				System.out.println(job_title+"  |  "+location+"  |  "+ contract_type+"  |  " +job_link);
 				
 				List<String> infos = new ArrayList<>();
 				infos.add(job_title.strip());
-				infos.add(location.strip());
+				infos.add(city);
+				infos.add(country);
 				infos.add(contract_type.strip());
 	
 				id_jobInfo.put(jobIndex, infos);
@@ -151,16 +161,18 @@ public class SqliJobCollector {
 				JobsOffers jobOffer = new JobsOffers();
                 jobOffer.setTitle(id_jobInfo.get(id).getFirst());
                 jobOffer.setCompany("SQLI");
-                jobOffer.setLocation(id_jobInfo.get(id).get(1));
+                jobOffer.setCity(id_jobInfo.get(id).get(1));
+                jobOffer.setCountry(id_jobInfo.get(id).get(2));
                 jobOffer.setUrl(apply_link);
-                jobOffer.setContractType(id_jobInfo.get(id).get(2));
+                jobOffer.setContractType(id_jobInfo.get(id).get(3));
                 jobOffer.setWorkMode("N/A");
                 jobOffer.setPublishDate("N/A");
                 jobOffer.setPost(innerHTML);
-                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 
                 		"SQLI", 
-                		id_jobInfo.get(id).get(1), 
+                		id_jobInfo.get(id).get(1),
+                		id_jobInfo.get(id).get(2),
                 		apply_link)){
                 	
                 	try {
