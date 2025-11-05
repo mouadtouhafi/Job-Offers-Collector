@@ -1,0 +1,1082 @@
+{
+    "Toluca Assembly Plant": {
+        "city": "Toluca",
+        "country": "Mexico"
+    },
+    "Toluca Stamping": {
+        "city": "Toluca",
+        "country": "Mexico"
+    },
+    "Mulhouse, Alsace": {
+        "city": "Mulhouse",
+        "country": "France"
+    },
+    "Auburn Hills, Etats Unis": {
+        "city": "AuburnHills",
+        "country": "United States"
+    },
+    "Bratislava, Bratislavsky": {
+        "city": "Bratislava",
+        "country": "Slovakia"
+    },
+    "Stellantis Nederland BV, Hollande": {
+        "city": "Amsterdam",
+        "country": "Netherlands"
+    },
+    "BETIM, Brésil": {
+        "city": "BETIM",
+        "country": "Brazil"
+    },
+    "Groß-Gerau, Hessen": {
+        "city": "Groß-Gerau",
+        "country": "Germany"
+    },
+    "Amsterdam, Noord Holland": {
+        "city": "Amsterdam",
+        "country": "Netherlands"
+    },
+    "Northeast Business Center": {
+        "city": "Jersey City, New Jersey",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Flint, MI": {
+        "city": "Flint",
+        "country": "United States"
+    },
+    "Kokomo Casting Plant - Kokomo": {
+        "city": "Kokomo",
+        "country": "United States"
+    },
+    "Kokomo Transmission Plant - Kokomo": {
+        "city": "Kokomo",
+        "country": "United States"
+    },
+    "Southeast Business Center - Richmond, VA": {
+        "city": "Richmond, Virginia",
+        "country": "United States"
+    },
+    "Kansas City Training Center - Kansas City": {
+        "city": "Kansas City",
+        "country": "United States"
+    },
+    "NortheastBusinessCenter-NewYork": {
+        "city": "New York",
+        "country": "United States"
+    },
+    "Saltillo South Engine Plant": {
+        "city": "Saltillo",
+        "country": "Mexico"
+    },
+    "Windsor Assembly Plant": {
+        "city": "Windsor",
+        "country": "Canada"
+    },
+    "Detroit Assembly Complex - Jefferson": {
+        "city": "Detroit",
+        "country": "United States"
+    },
+    "Kokomo Metropolitan Area - Kokomo": {
+        "city": "Kokomo",
+        "country": "United States"
+    },
+    "Charleston, SC": {
+        "city": "Charleston",
+        "country": "United States"
+    },
+    "Belvidere Assembly Plant - Belvidere": {
+        "city": "Belvidere",
+        "country": "United States"
+    },
+    "Auburn Hills - CTC, Etats Unis": {
+        "city": "AuburnHills-CTC",
+        "country": "United States"
+    },
+    "Voujeaucourt, Doubs": {
+        "city": "Voujeaucourt",
+        "country": "France"
+    },
+    "Montbéliard, Doubs": {
+        "city": "Montbéliard",
+        "country": "France"
+    },
+    "Milwaukee Parts Distribution Center - Milwaukee": {
+        "city": "Milwaukee",
+        "country": "United States"
+    },
+    "Etobicoke Casting Plant": {
+        "city": "Etobicoke",
+        "country": "Canada"
+    },
+    "FCA Group Transport - Windsor Terminal": {
+        "city": "Ontario",
+        "country": "Canada"
+    },
+    "Orlando Parts Distribution Center - Orlando": {
+        "city": "Orlando",
+        "country": "United States"
+    },
+    "Great Lakes Business Center": {
+        "city": "Auburn Hills, Michigan",
+        "country": "United States"
+    },
+    "Denver Parts Distribution Center - Denver": {
+        "city": "Denver",
+        "country": "United States"
+    },
+    "Sherwood - Parts Distribution Center": {
+        "city": "Warren, Michigan",
+        "country": "United States"
+    },
+    "Warren Parts Distribution Center": {
+        "city": "Warren, Michigan",
+        "country": "United States"
+    },
+    "Saltillo Truck & Van Plant": {
+        "city": "Saltillo",
+        "country": "Mexico"
+    },
+    "Mopar Complex - Center Line": {
+        "city": "Michigan",
+        "country": "United States"
+    },
+    "National Technical Training Center - Auburn Hills": {
+        "city": "Auburn Hills",
+        "country": "United States"
+    },
+    "Southeast Business Center - Raleigh/Winston-Roanoake, NC": {
+        "city": "Roanoake",
+        "country": "United States"
+    },
+    "Los Angeles Training Center - Ontario": {
+        "city": "Ontario",
+        "country": "United States"
+    },
+    "TURIN, Italie": {
+        "city": "TURIN",
+        "country": "Italy"
+    },
+    "Southeast Business Center - Orlando, FL": {
+        "city": "Orlando",
+        "country": "United States"
+    },
+    "West Business Center": {
+        "city": "Phoenix, Arizona",
+        "country": "United States"
+    },
+    "Dundee Engine Plant - Dundee": {
+        "city": "Dundee",
+        "country": "United States"
+    },
+    "Jefferson North Assembly Plant - Detroit": {
+        "city": "Detroit",
+        "country": "United States"
+    },
+    "Sterling Stamping - Sterling Heights": {
+        "city": "Sterling Heights",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Detroit, MI": {
+        "city": "Detroit",
+        "country": "United States"
+    },
+    "Vigo, Galicia": {
+        "city": "Vigo",
+        "country": "Spain"
+    },
+    "Midwest Business Center - Chicago, IL": {
+        "city": "Chicago",
+        "country": "United States"
+    },
+    "POISSY (78), FR": {
+        "city": "POISSY(78)",
+        "country": "France"
+    },
+    "Warren Truck Assembly Plant - Warren": {
+        "city": "Warren",
+        "country": "United States"
+    },
+    "Portland Parts Distribution Center - Beaverton": {
+        "city": "Beaverton",
+        "country": "United States"
+    },
+    "Northeast Business Center - Erie, PA": {
+        "city": "Erie",
+        "country": "United States"
+    },
+    "Lisbonne, PT": {
+        "city": "Lisbonne",
+        "country": "Portugal"
+    },
+    "Northeast Business Center - Jersey City, NJ": {
+        "city": "Jersey City",
+        "country": "United States"
+    },
+    "Northeast Business Center - Paterson, NJ": {
+        "city": "Paterson",
+        "country": "United States"
+    },
+    "Northeast Business Center - White River, VT": {
+        "city": "White River",
+        "country": "United States"
+    },
+    "Northeast Business Center - Worcester, MA": {
+        "city": "Worcester",
+        "country": "United States"
+    },
+    "Northeast Business Center - Turnersville, NJ": {
+        "city": "Turnersville",
+        "country": "United States"
+    },
+    "Northeast Business Center - Binghamton, NY": {
+        "city": "Binghamton",
+        "country": "United States"
+    },
+    "Northeast Business Center - Brockton, MA": {
+        "city": "Brockton",
+        "country": "United States"
+    },
+    "Northeast Business Center - Norwich, CT": {
+        "city": "Norwich",
+        "country": "United States"
+    },
+    "Northeast Business Center - Jamestown, NY": {
+        "city": "Jamestown",
+        "country": "United States"
+    },
+    "Midwest Business Center - Nebraska": {
+        "city": "Nebraska",
+        "country": "United States"
+    },
+    "Southwest Business Center - Oklahoma City, OK": {
+        "city": "Oklahoma City",
+        "country": "United States"
+    },
+    "Southwest Business Center - Houston, TX": {
+        "city": "Houston",
+        "country": "United States"
+    },
+    "Southwest Business Center - Jackson, MS": {
+        "city": "Jackson, Mississippi",
+        "country": "United States"
+    },
+    "Southwest Business Center - Mobile, AL": {
+        "city": "Mobile, Alabama",
+        "country": "United States"
+    },
+    "Southwest Business Center - El Paso, TX": {
+        "city": "El Paso, Texas",
+        "country": "United States"
+    },
+    "Midwest Business Center - Omaha, NE": {
+        "city": "Omaha, Nebraska",
+        "country": "United States"
+    },
+    "Toledo Machining Plant - Perrysburg": {
+        "city": "Perrysburg",
+        "country": "United States"
+    },
+    "Northeast Business Center - New Brunswick, NJ": {
+        "city": "New Brunswick, New Jersey",
+        "country": "United States"
+    },
+    "Northeast Business Center - Wilmington, DE": {
+        "city": "Wilmington, Delaware",
+        "country": "United States"
+    },
+    "Northeast Business Center - Harrisburg, PA": {
+        "city": "Harrisburg, Pennsylvania",
+        "country": "United States"
+    },
+    "West Business Center - Casper, Wyoming": {
+        "city": "Casper, Wyoming",
+        "country": "United States"
+    },
+    "New York Parts Distribution Center - East Fishkill": {
+        "city": "New York",
+        "country": "United States"
+    },
+    "Southwest Business Center - Dallas, TX": {
+        "city": "Dallas",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Nashville/Knoxville": {
+        "city": "Nashville, Knoxville",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Nashville, TN": {
+        "city": "Nashville, Tennessee",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Columbus, OH": {
+        "city": "Columbus, Ohio",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Charleston/Huntington, WV": {
+        "city": "Charleston, Huntington",
+        "country": "United States"
+    },
+    "DOMPIERRE SUR BESBRE, FR": {
+        "city": "Dompierre-sur-Besbre",
+        "country": "France"
+    },
+    "Tremery, Moselle": {
+        "city": "Tremery",
+        "country": "France"
+    },
+    "West Business Center - Phoenix, AZ": {
+        "city": "Phoenix, Arizona",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Louisville, KY": {
+        "city": "Louisville, Kentucky",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Lexington": {
+        "city": "Lexington",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Evansville": {
+        "city": "Evansville, Indiana",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Chillicothe/Athens, OH": {
+        "city": "Chillicothe, Athens",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Canton, OH": {
+        "city": "Canton, Ohio",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Indianapolis, IN": {
+        "city": "Indianapolis",
+        "country": "United States"
+    },
+    "SITE D'HORDAIN, FR": {
+        "city": "SITED'HORDAIN",
+        "country": "France"
+    },
+    "Madrid, Madrid": {
+        "city": "Madrid",
+        "country": "Spain"
+    },
+    "Vienna, Wien": {
+        "city": "Vienna",
+        "country": "Austria"
+    },
+    "EVERE, Belgique": {
+        "city": "EVERE",
+        "country": "Belgium"
+    },
+    "Warsaw, Mazowieckie": {
+        "city": "Warsaw",
+        "country": "Poland"
+    },
+    "Modena, Italie": {
+        "city": "Modena",
+        "country": "Italy"
+    },
+    "GreatLakesBusinessCenterEvansville,IN": {
+        "city": "Evansville, Indiana",
+        "country": "United States"
+    },
+    "Rennes, Ille-et-Vilaine": {
+        "city": "Rennes",
+        "country": "France"
+    },
+    "MidwestBusinessCenter-Missouri": {
+        "city": "Missouri",
+        "country": "United States"
+    },
+    "MidwestBusinessCenter-Springfield,MO": {
+        "city": "Springfield",
+        "country": "United States"
+    },
+    "MidwestBusinessCenter-Minneapolis,MN": {
+        "city": "Minneapolis",
+        "country": "United States"
+    },
+    "Southwest Business Center - San Antonio, TX": {
+        "city": "San Antonio",
+        "country": "United States"
+    },
+    "Valenciennes, Nord": {
+        "city": "Valenciennes",
+        "country": "France"
+    },
+    "SoutheastBusinessCenter-PanhandleFL/Macon,GA": {
+        "city": "PanhandleFL, Macon",
+        "country": "United States"
+    },
+    "SoutheastBusinessCenter-Jacksonville/CentralFL": {
+        "city": "Jacksonville",
+        "country": "United States"
+    },
+    "SoutheastBusinessCenter-SavannahGA/Charleston,SC": {
+        "city": "SavannahGA, Charleston",
+        "country": "United States"
+    },
+    "MidwestBusinessCenter-Fargo,ND": {
+        "city": "Fargo, North Dakota",
+        "country": "United States"
+    },
+    "MidwestBusinessCenter-KansasCity,MO": {
+        "city": "Kansas City",
+        "country": "United States"
+    },
+    "MidwestBusinessCenter-IowaCity,IA": {
+        "city": "Iowa City",
+        "country": "United States"
+    },
+    "MidwestBusinessCenter-Milwaukee,WI": {
+        "city": "Milwaukee",
+        "country": "United States"
+    },
+    "MidwestBusinessCenter-JeffersonCity,MO": {
+        "city": "Jefferson City, Missouri",
+        "country": "United States"
+    },
+    "SouthwestBusinessCenter-Austin,TX": {
+        "city": "Austin",
+        "country": "United States"
+    },
+    "SouthwestBusinessCenter-Shreveport,LA": {
+        "city": "Shreveport",
+        "country": "United States"
+    },
+    "SouthwestBusinessCenter-Gulfport,MS": {
+        "city": "Gulfport",
+        "country": "United States"
+    },
+    "GreatLakesBusinessCenter-Kalamazoo/Lansing,MI": {
+        "city": "Kalamazoo, Lansing",
+        "country": "United States"
+    },
+    "SoutheastBusinessCenter-Winston/Greensboro,NC": {
+        "city": "Winston, Greensboro",
+        "country": "United States"
+    },
+    "SouthwestBusinessCenter-Tyler,TX": {
+        "city": "Tyler",
+        "country": "United States"
+    },
+    "MidwestBusinessCenter-KansasCity/St.Louis": {
+        "city": "KansasCity, St.Louis",
+        "country": "United States"
+    },
+    "GreatLakesBusinessCenter-Memphis": {
+        "city": "Memphis, Tennessee",
+        "country": "United States"
+    },
+    "Turin, Piemonte": {
+        "city": "Turin",
+        "country": "Italy"
+    },
+    "Vesoul, Haute-Saône": {
+        "city": "Vesoul",
+        "country": "France"
+    },
+    "Great Lakes Business Center - Alpena/Gaylord, MI": {
+        "city": "Alpena, Gaylord",
+        "country": "United States"
+    },
+    "GreatLakesBusinessCenter-Charleston,WestVirginia": {
+        "city": "West Virginia",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Bowling Green, KY": {
+        "city": "Bowling Green",
+        "country": "United States"
+    },
+    "NortheastBusinessCenter-Providence": {
+        "city": "Tappan, New York",
+        "country": "United States"
+    },
+    "Northeast Business Center - Mahwah, NJ": {
+        "city": "Mahwah",
+        "country": "United States"
+    },
+    "NortheastBusinessCenter-Boston,MA": {
+        "city": "Boston",
+        "country": "United States"
+    },
+    "NortheastBusinessCenter-Keene,VT": {
+        "city": "Keene",
+        "country": "United States"
+    },
+    "Southeast Business Center - Greenville, NC": {
+        "city": "Greenville",
+        "country": "United States"
+    },
+    "Southeast Business Center - Fairfax/Chantilly, VA": {
+        "city": "Fairfax, Chantilly",
+        "country": "United States"
+    },
+    "Southeast Business Center - Woodbridge/Springfield, VA": {
+        "city": "Woodbridge, Springfield",
+        "country": "United States"
+    },
+    "CEMR POISSY, FR": {
+        "city": "CEMRPOISSY",
+        "country": "France"
+    },
+    "Midwest Business Center - Wausau, WI": {
+        "city": "Wausau",
+        "country": "United States"
+    },
+    "Southwest Business Center - McAllen, TX": {
+        "city": "McAllen",
+        "country": "United States"
+    },
+    "Southeast Business Center - Macon, GA": {
+        "city": "Macon",
+        "country": "United States"
+    },
+    "Southwest Business Center - Baton Rouge, LA": {
+        "city": "Baton Rouge",
+        "country": "United States"
+    },
+    "Northeast Business Center - Portland, ME": {
+        "city": "Portland",
+        "country": "United States"
+    },
+    "Poissy, Yvelines": {
+        "city": "Poissy",
+        "country": "France"
+    },
+    "West Business Center - Denver/Salt Lake City": {
+        "city": "Denver, SaltLakeCity",
+        "country": "United States"
+    },
+    "Midwest Business Center - Springfield, IL": {
+        "city": "Springfield",
+        "country": "United States"
+    },
+    "West Business Center - Seattle, WA": {
+        "city": "Seattle",
+        "country": "United States"
+    },
+    "West Business Center - Portland, OR": {
+        "city": "Portland",
+        "country": "United States"
+    },
+    "West Business Center - Salt Lake City, UT": {
+        "city": "Salt Lake City",
+        "country": "United States"
+    },
+    "West Business Center - Reno, NV": {
+        "city": "Reno",
+        "country": "United States"
+    },
+    "West Business Center - Boise, ID": {
+        "city": "Boise",
+        "country": "United States"
+    },
+    "West Business Center - Vallejo, CA": {
+        "city": "Vallejo",
+        "country": "United States"
+    },
+    "Southwest Business Center - Bentonville, AR": {
+        "city": "Bentonville",
+        "country": "United States"
+    },
+    "Southwest Business Center - Corpus Christi, TX": {
+        "city": "Corpus Christi",
+        "country": "United States"
+    },
+    "Southwest Business Center - Huntsville, AL": {
+        "city": "Huntsville",
+        "country": "United States"
+    },
+    "Southwest Business Center - Lubbock, TX": {
+        "city": "Lubbock",
+        "country": "United States"
+    },
+    "Southwest Business Center - Beaumont, TX": {
+        "city": "Beaumont",
+        "country": "United States"
+    },
+    "CENTRE D'EXPERTISE POISSY - GREEN CAMPUS, FR": {
+        "city": "Poissy",
+        "country": "France"
+    },
+    "Paris, Île-de-France": {
+        "city": "Paris",
+        "country": "France"
+    },
+    "Great Lakes Business Center - Dayton, OH": {
+        "city": "Dayton",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Memphis, TN": {
+        "city": "Memphis",
+        "country": "United States"
+    },
+    "West Business Center - Merced, CA": {
+        "city": "Merced",
+        "country": "United States"
+    },
+    "West Business Center - Bozeman, MT": {
+        "city": "Bozeman",
+        "country": "United States"
+    },
+    "West Business Center - Tacoma, WA": {
+        "city": "Tacoma",
+        "country": "United States"
+    },
+    "Marignane, Bouches-du-Rhône": {
+        "city": "Marignane",
+        "country": "France"
+    },
+    "Stellantis Creative Center - Vélizy-Villacoublay, FR": {
+        "city": "Vélizy-Villacoublay",
+        "country": "France"
+    },
+    "West Business Center - Los Angeles, CA": {
+        "city": "Los Angeles",
+        "country": "United States"
+    },
+    "West Business Center - Las Vegas, NV": {
+        "city": "Las Vegas",
+        "country": "United States"
+    },
+    "Southwest Business Center - Abilene, TX": {
+        "city": "Abilene",
+        "country": "United States"
+    },
+    "Midwest Business Center - Cedar Rapids/Davenport": {
+        "city": "CedarRapids, Davenport",
+        "country": "United States"
+    },
+    "Midwest Business Center - St. Louis/Columbia, MO": {
+        "city": "St.Louis, Columbia",
+        "country": "United States"
+    },
+    "Midwest Business Center - Sioux Falls, SD": {
+        "city": "Sioux Falls",
+        "country": "United States"
+    },
+    "MidwestBusinessCenter-NE/KS": {
+        "city": "NE, KS",
+        "country": "United States"
+    },
+    "West Business Center - San Bernardino, California": {
+        "city": "San Bernardino",
+        "country": "United States"
+    },
+    "Southeast Business Center - Washington DC W/S, VA": {
+        "city": "WashingtonDCW, S",
+        "country": "United States"
+    },
+    "Southeast Business Center - Wilmington/E Carolina, NC": {
+        "city": "Wilmington, ECarolina",
+        "country": "United States"
+    },
+    "Southeast Business Center - Atlanta, GA": {
+        "city": "Atlanta",
+        "country": "United States"
+    },
+    "Northeast Business Center - Oyster Bay, NY": {
+        "city": "Oyster Bay",
+        "country": "United States"
+    },
+    "Southeast Business Center - Tampa-St. Pete, FL": {
+        "city": "St. Petersburg, Florida",
+        "country": "United States"
+    },
+    "Southeast Business Center - Sanford/Daytona Beach, FL": {
+        "city": "Sanford, DaytonaBeach",
+        "country": "United States"
+    },
+    "QEC Building - Auburn Hills": {
+        "city": "Auburn Hills, Michigan",
+        "country": "United States"
+    },
+    "Southeast Business Center - West Palm, FL": {
+        "city": "West Palm",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Fort Wayne, IN": {
+        "city": "Fort Wayne",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Cleveland, OH": {
+        "city": "Cleveland",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Lansing": {
+        "city": "Lansing",
+        "country": "United States"
+    },
+    "Northeast Business Center - Rochester, NY": {
+        "city": "Rochester",
+        "country": "United States"
+    },
+    "Southwest Business Center - Albuquerque, NM": {
+        "city": "Albuquerque",
+        "country": "United States"
+    },
+    "Orlando Training Center - Orlando": {
+        "city": "Orlando",
+        "country": "United States"
+    },
+    "Indiana Transmission 1 Plant - Kokomo": {
+        "city": "Kokomo",
+        "country": "United States"
+    },
+    "Washington DC Metropolitan Area - Washington DC": {
+        "city": "Washington DC",
+        "country": "United States"
+    },
+    "Metz, Moselle": {
+        "city": "Metz",
+        "country": "France"
+    },
+    "Diou, Allier": {
+        "city": "Diou",
+        "country": "France"
+    },
+    "Orlando Metropolitan Area - Orlando": {
+        "city": "Orlando",
+        "country": "United States"
+    },
+    "Minneapolis Parts Distribution Center - Plymouth": {
+        "city": "Plymouth, Minnesota",
+        "country": "United States"
+    },
+    "Los Angeles Parts Distribution Center - Ontario": {
+        "city": "Ontario",
+        "country": "United States"
+    },
+    "Winchester Parts Distribution Center - Winchester": {
+        "city": "Winchester, Virginia",
+        "country": "United States"
+    },
+    "Chicago Parts Distribution Center & Training Center - Naperville": {
+        "city": "Naperville",
+        "country": "United States"
+    },
+    "DallasPartsDistrubutionCenter-Carrollton": {
+        "city": "Carrollton, Texas",
+        "country": "United States"
+    },
+    "Valentigney, Doubs": {
+        "city": "Valentigney",
+        "country": "France"
+    },
+    "Creative Center Vélizy, FR": {
+        "city": "CreativecenterVélizy",
+        "country": "France"
+    },
+    "Rennes, Brittany": {
+        "city": "Rennes",
+        "country": "France"
+    },
+    "Doubs, Franche-Comté": {
+        "city": "Doubs",
+        "country": "France"
+    },
+    "Belchamp, Haute-Savoie": {
+        "city": "Belchamp",
+        "country": "France"
+    },
+    "Velizy-Villacoublay, FR": {
+        "city": "Velizy-Villacoublay",
+        "country": "France"
+    },
+    "Versailles, Île-de-France": {
+        "city": "Versailles",
+        "country": "France"
+    },
+    "Atlanta Metropolitan Area - Atlanta": {
+        "city": "Atlanta",
+        "country": "United States"
+    },
+    "Vélizy-Villacoublay, Yvelines": {
+        "city": "Vélizy-Villacoublay",
+        "country": "France"
+    },
+    "Poissy/Sochaux, FR": {
+        "city": "Poissy, Sochaux",
+        "country": "United States"
+    },
+    "Remote": {
+        "city": "Remote",
+        "country": "Remote"
+    },
+    "Detroit Assembly Complex - Mack": {
+        "city": "Detroit",
+        "country": "United States"
+    },
+    "Southfield, MI": {
+        "city": "Southfield",
+        "country": "United States"
+    },
+    "Sterling Heights Assembly Plant - Sterling Heights": {
+        "city": "Sterling Heights",
+        "country": "United States"
+    },
+    "Detroit Metropolitan Area - Michigan": {
+        "city": "Michigan",
+        "country": "United States"
+    },
+    "Toledo Assembly Complex - Toledo": {
+        "city": "Toledo",
+        "country": "United States"
+    },
+    "Toledo Metropolitan Area - Toledo": {
+        "city": "Toledo",
+        "country": "United States"
+    },
+    "Kokomo Engine Plant - Kokomo": {
+        "city": "Kokomo",
+        "country": "United States"
+    },
+    "Nationwide Opportunities": {
+        "city": "Worldwide",
+        "country": "Worldwide"
+    },
+    "Sochaux, Doubs": {
+        "city": "Sochaux",
+        "country": "France"
+    },
+    "Group Transport - Detroit": {
+        "city": "Detroit",
+        "country": "United States"
+    },
+    "Warren Stamping Plant - Warren": {
+        "city": "Warren",
+        "country": "United States"
+    },
+    "Saltillo Assembly": {
+        "city": "Saltillo",
+        "country": "Mexico"
+    },
+    "Headquarters & Technology Center - Auburn Hills": {
+        "city": "Auburn Hills, Michigan",
+        "country": "United States"
+    },
+    "Automotive Research & Dev. Ctr (ARDC)": {
+        "city": "Windsor",
+        "country": "Canada"
+    },
+    "Proving Grounds - Chelsea": {
+        "city": "Chelsea, Michigan",
+        "country": "United States"
+    },
+    "FCA Mexico - Santa Fe Corporate Services": {
+        "city": "Mexico City",
+        "country": "United States"
+    },
+    "FCA Canada Inc. - Headquarters": {
+        "city": "Windsor",
+        "country": "Canada"
+    },
+    "Quebec Business Center": {
+        "city": "Montreal, Québec",
+        "country": "Canada"
+    },
+    "Hordain, Nord": {
+        "city": "Hordain",
+        "country": "France"
+    },
+    "Lyon, Rhône Alpes": {
+        "city": "Lyon",
+        "country": "France"
+    },
+    "Bordeaux, Gironde": {
+        "city": "Bordeaux",
+        "country": "France"
+    },
+    "Caen, Calvados": {
+        "city": "Caen",
+        "country": "France"
+    },
+    "Saltillo North Engine Plant": {
+        "city": "Saltillo",
+        "country": "Mexico"
+    },
+    "Charleville-Mézières, Champagne-Ardennes": {
+        "city": "Charleville-Mézières",
+        "country": "France"
+    },
+    "Kenitra, Rabat-Sale": {
+        "city": "Kenitra",
+        "country": "Morocco"
+    },
+    "Poissy, Île-de-France": {
+        "city": "Poissy",
+        "country": "France"
+    },
+    "Casablanca, Settat": {
+        "city": "Casablanca",
+        "country": "Morocco"
+    },
+    "Hyderabad, Telangana": {
+        "city": "Hyderabad",
+        "country": "India"
+    },
+    "Betim, Minas Gerais": {
+        "city": "Betim",
+        "country": "Brazil"
+    },
+    "Jiading, Shanghai": {
+        "city": "Jiading",
+        "country": "China"
+    },
+    "Saltillo Metropolitan Area - Mexico": {
+        "city": "Saltillo",
+        "country": "Mexico"
+    },
+    "Northeast Business Center - New York": {
+        "city": "New York",
+        "country": "United States"
+    },
+    "Southeast Business Center - Raleigh / Winston-Roanoake, NC": {
+        "city": "Raleigh / Winston-Roanoke",
+        "country": "United States"
+    },
+    "Portland Parts Distribution Center -Beaverton": {
+        "city": "Beaverton",
+        "country": "United States"
+    },
+    "Great Lakes Business Center Louisville, KY": {
+        "city": "Louisville",
+        "country": "United States"
+    },
+    "Great Lakes Business Center Evansville, IN": {
+        "city": "Evansville",
+        "country": "United States"
+    },
+    "Midwest Business Center - Missouri": {
+        "city": "Missouri",
+        "country": "United States"
+    },
+    "Midwest Business Center - Springfield, MO": {
+        "city": "Springfield",
+        "country": "United States"
+    },
+    "Midwest Business Center - Minneapolis, MN": {
+        "city": "Minneapolis",
+        "country": "United States"
+    },
+    "Southeast Business Center - Panhandle FL /Macon, GA": {
+        "city": "Panhandle / Macon",
+        "country": "United States"
+    },
+    "Southeast Business Center - Jacksonville/Central FL": {
+        "city": "Jacksonville / Central Florida",
+        "country": "United States"
+    },
+    "Southeast Business Center - Savannah GA / Charleston, SC": {
+        "city": "Savannah / Charleston",
+        "country": "United States"
+    },
+    "Midwest Business Center - Fargo, ND": {
+        "city": "Fargo",
+        "country": "United States"
+    },
+    "Midwest Business Center - Kansas City, MO": {
+        "city": "Kansas City",
+        "country": "United States"
+    },
+    "Midwest Business Center - Iowa City, IA": {
+        "city": "Iowa City",
+        "country": "United States"
+    },
+    "Midwest Business Center - Jefferson City, MO": {
+        "city": "Jefferson City",
+        "country": "United States"
+    },
+    "Southwest Business Center - Austin, TX": {
+        "city": "Austin",
+        "country": "United States"
+    },
+    "Southwest Business Center - Shreveport, LA": {
+        "city": "Shreveport",
+        "country": "United States"
+    },
+    "Southwest Business Center - Gulfport, MS": {
+        "city": "Gulfport",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Kalamazoo/Lansing, MI": {
+        "city": "Kalamazoo / Lansing",
+        "country": "United States"
+    },
+    "Southeast Business Center - Winston / Greensboro, NC": {
+        "city": "Winston / Greensboro",
+        "country": "United States"
+    },
+    "Southwest Business Center - Tyler, TX": {
+        "city": "Tyler",
+        "country": "United States"
+    },
+    "Midwest Business Center - Kansas City / St. Louis": {
+        "city": "Kansas City / St. Louis",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Memphis": {
+        "city": "Memphis",
+        "country": "United States"
+    },
+    "Great Lakes Business Center - Charleston, West Virginia": {
+        "city": "Charleston",
+        "country": "United States"
+    },
+    "Northeast Business Center - Providence": {
+        "city": "Providence",
+        "country": "United States"
+    },
+    "Northeast Business Center - Boston, MA": {
+        "city": "Boston",
+        "country": "United States"
+    },
+    "Northeast Business Center - Keene, VT": {
+        "city": "Keene",
+        "country": "United States"
+    },
+    "Great Lakes Business Center Dayton, OH": {
+        "city": "Dayton",
+        "country": "United States"
+    },
+    "Great Lakes Business Center Memphis, TN": {
+        "city": "Memphis",
+        "country": "United States"
+    },
+    "Midwest Business Center - Cedar Rapids / Davenport": {
+        "city": "Cedar Rapids / Davenport",
+        "country": "United States"
+    },
+    "Midwest Business Center - NE/KS": {
+        "city": "Kansas / Nebraska",
+        "country": "United States"
+    },
+    "Southeast Business Center - Washington DC W / S, VA": {
+        "city": "Washington D.C.",
+        "country": "United States"
+    },
+    "Midwest Business Center - Milwaukee, WI": {
+        "city": "Milwaukee",
+        "country": "United States"
+    },
+    "Creative center Vélizy, FR": {
+        "city": "Vélizy-Villacoublay",
+        "country": "France"
+    },
+    "Doubs, Franche Comté": {
+        "city": "Doubs",
+        "country": "France"
+    },
+    "Poissy / Sochaux, FR": {
+        "city": "Poissy / Sochaux",
+        "country": "France"
+    },
+    "Dallas Parts Distrubution Center - Carrollton": {
+        "city": "Carrollton",
+        "country": "United States"
+    },
+    "Automotive Research & Dev. Ctr(ARDC)": {
+        "city": "Auburn Hills",
+        "country": "United States"
+    }
+}
