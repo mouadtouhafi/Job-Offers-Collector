@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.openqa.selenium.By;
@@ -27,6 +28,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
+import com.websolutions.companies.collection.locations.DetectCities;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
 @Service
@@ -41,10 +43,12 @@ public class AkkodisJobCollector {
     private boolean isFinalPageReached = false;
     private int maxNumberOfPagesClicked = 3;
     private String AkkodisLink = "https://www.akkodis.com/en-us/careers/job-results";
+    private final DetectCities detectCities;
 	
-	public AkkodisJobCollector(JobsOffersRepository jobsOffersRepository) {
+	public AkkodisJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities) {
 		super();
 		this.jobsOffersRepository = jobsOffersRepository;
+		this.detectCities = detectCities;
 	}
 
 	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
@@ -107,12 +111,20 @@ public class AkkodisJobCollector {
 							   job.findElement(By.tagName("a"))
 							   .getDomAttribute("href");
 					
+					String city = location.strip();
+					String country = "N/A";	
+					Optional<String> detectedCountry = detectCities.getCountryForCity(city);
+					if(detectedCountry.isPresent()) {
+						country = detectedCountry.get();
+					}
+					
 					System.out.println(job_title+"  |  "+location+"  |  "+ publish_date+"  |  " + contract_type);
 					publish_date = date_formatter(publish_date);
 					if(dateCheckValabilityStatus(publish_date)) {
 						List<String> infos = new ArrayList<>();
 						infos.add(job_title.strip());
-						infos.add(location);
+						infos.add(city);
+						infos.add(country);
 						infos.add(publish_date);
 						infos.add(contract_type);
 			
@@ -195,16 +207,18 @@ public class AkkodisJobCollector {
 				JobsOffers jobOffer = new JobsOffers();
                 jobOffer.setTitle(id_jobInfo.get(id).getFirst());
                 jobOffer.setCompany("Akkodis");
-                jobOffer.setLocation(id_jobInfo.get(id).get(1));
+                jobOffer.setCity(id_jobInfo.get(id).get(1));
+                jobOffer.setCountry(id_jobInfo.get(id).get(2));
                 jobOffer.setUrl(apply_link);
-                jobOffer.setContractType(id_jobInfo.get(id).get(3));
+                jobOffer.setContractType(id_jobInfo.get(id).get(4));
                 jobOffer.setWorkMode("N/A");
-                jobOffer.setPublishDate(id_jobInfo.get(id).get(2));
+                jobOffer.setPublishDate(id_jobInfo.get(id).get(3));
                 jobOffer.setPost(innerHTML);
-                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 
                 		"Akkodis", 
-                		id_jobInfo.get(id).get(1), 
+                		id_jobInfo.get(id).get(1),
+                		id_jobInfo.get(id).get(2),
                 		apply_link)){
                 	
                 	try {
