@@ -1,6 +1,6 @@
 package com.websolutions.companies.collection.services;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -9,6 +9,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.openqa.selenium.By;
@@ -25,6 +26,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
+import com.websolutions.companies.collection.locations.DetectCities;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 
 @Service
@@ -38,13 +40,15 @@ public class ApsideJobCollector {
     private String ApsideLink = "https://www.apside.com/fr/nos-offres-emploi/";
     private int maxNumberOfPagesClicked = 3;
     boolean isFinalPageReached = false;
+    private final DetectCities detectCities;
 	
-	public ApsideJobCollector(JobsOffersRepository jobsOffersRepository) {
+	public ApsideJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities) {
 		super();
 		this.jobsOffersRepository = jobsOffersRepository;
+		this.detectCities = detectCities;
 	}
 	
-	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
+	public void getFulljobs(boolean isFullJobsCollection) throws IOException, InterruptedException {
 		int jobIndex = 0;
 		
 		options = new EdgeOptions();
@@ -125,6 +129,16 @@ public class ApsideJobCollector {
 					}
 				}
 				
+				String city = "N/A";
+				String country = "N/A";
+				if(!location.equals("N/A")) {
+					city = location;
+					Optional<String> detectedCountry = detectCities.getCountryForCity(city);
+					if(detectedCountry.isPresent()) {
+						country = detectedCountry.get();
+					}
+				}
+				
 				String job_link = job.findElement(By.tagName("a")).getDomAttribute("href");
 				
 				System.out.println(publish_date+"  |  "+ contract_type + "  |  "+location);
@@ -136,7 +150,8 @@ public class ApsideJobCollector {
 					infos.add(job_title.strip());
 					infos.add(contract_type.strip());
 					infos.add(publish_date.strip());
-					infos.add(location);
+					infos.add(city);
+					infos.add(country);
 		
 					id_jobInfo.put(jobIndex, infos);
 					jobsLinks.put(jobIndex, job_link);
@@ -212,16 +227,18 @@ public class ApsideJobCollector {
 				JobsOffers jobOffer = new JobsOffers();
                 jobOffer.setTitle(id_jobInfo.get(id).getFirst());
                 jobOffer.setCompany("Apside");
-                jobOffer.setLocation(id_jobInfo.get(id).get(3));
+                jobOffer.setCity(id_jobInfo.get(id).get(3));
+                jobOffer.setCountry(id_jobInfo.get(id).get(4));
                 jobOffer.setUrl(apply_link);
                 jobOffer.setContractType(id_jobInfo.get(id).get(1));
                 jobOffer.setWorkMode("N/A");
                 jobOffer.setPublishDate(id_jobInfo.get(id).get(2));
                 jobOffer.setPost(innerHTML);
-                if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 
                 		"Apside", 
                 		id_jobInfo.get(id).get(3), 
+                		id_jobInfo.get(id).get(4), 
                 		apply_link)){
                 	
                 	try {
