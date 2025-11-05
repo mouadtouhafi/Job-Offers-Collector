@@ -1,10 +1,10 @@
 package com.websolutions.companies.collection.entites;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -45,14 +45,11 @@ public class JobsOffers {
     private String publishDate;
     
     /*
-     * @Lob is a JPA annotation that tells the database a field should be stored as a Large Object. 
-     * It’s typically used when we have text or binary data that can be much larger than normal column sizes. 
-     * If applied to a String, it maps to a CLOB (Character Large Object) → for long text, e.g., job descriptions, articles, logs.
-     * If applied to a byte[] or Byte[], it maps to a BLOB (Binary Large Object) → for files, images, PDFs, etc.
-     * In our case, putting @Lob on the description field of JobOffer means we can safely store very long job 
-     * descriptions without hitting character length limits of standard text columns.
+     * @Column(columnDefinition = "TEXT") tells Hibernate to store this field as a TEXT column
+	 * in the database. TEXT can hold very large strings, making it ideal for long job descriptions.
+	 * It’s similar to @Lob but simpler, as the data is stored directly in the table.
      * */
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String post;
 
     public JobsOffers() {
