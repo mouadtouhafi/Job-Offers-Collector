@@ -175,7 +175,13 @@ public class AltenJobCollector {
 								WebElement location_element = job.findElement(
 										By.cssSelector("div.col-md-3.order-2.px-1.px-md-2.py-2.d-flex.card-location "
 												+ "span.location-list.ms-2.d-flex.flex-column"));
-								String location = location_element.getText();
+								String city = location_element.getText().strip().replace("\n", ", ");
+								String formattedCountry = "N/A";
+								formattedCountry = country.substring(0,1).toUpperCase() + country.substring(1).toLowerCase();
+								
+								
+								
+								
 								WebElement publish_date_element = job.findElement(
 										By.cssSelector("div.col-md-2.order-3.px-1.px-md-2.py-2.card-date span.mx-2"));
 
@@ -183,7 +189,8 @@ public class AltenJobCollector {
 								if (dateCheckValabilityStatus(publish_date)) {
 									List<String> infos = new ArrayList<>();
 									infos.add(job_title.strip());
-									infos.add(location.strip().replace("\n", ", "));
+									infos.add(city);
+									infos.add(formattedCountry);
 									infos.add("N/A");
 									infos.add("N/A");
 									infos.add(publish_date.strip());
@@ -277,17 +284,19 @@ public class AltenJobCollector {
 							JobsOffers jobOffer = new JobsOffers();
 							jobOffer.setTitle(id_jobInfo.get(id).getFirst());
 							jobOffer.setCompany("Alten");
-							jobOffer.setLocation(id_jobInfo.get(id).get(1));
+							jobOffer.setCity(id_jobInfo.get(id).get(1));
+							jobOffer.setCountry(id_jobInfo.get(id).get(2));
 							jobOffer.setUrl(applyLink);
-							jobOffer.setContractType(id_jobInfo.get(id).get(2));
-							jobOffer.setWorkMode(id_jobInfo.get(id).get(3));
-							jobOffer.setPublishDate(id_jobInfo.get(id).get(4));
+							jobOffer.setContractType(id_jobInfo.get(id).get(3));
+							jobOffer.setWorkMode(id_jobInfo.get(id).get(4));
+							jobOffer.setPublishDate(id_jobInfo.get(id).get(5));
 							jobOffer.setPost(innerHTML);
 
-							if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+							if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
 									id_jobInfo.get(id).getFirst(), 
 									"Alten", 
-									id_jobInfo.get(id).get(1), 
+									id_jobInfo.get(id).get(1),
+									id_jobInfo.get(id).get(2),
 									applyLink)) {
 								try {
 									jobsOffersRepository.save(jobOffer);
@@ -338,12 +347,18 @@ public class AltenJobCollector {
 									.getText().trim();
 							String contract_type = linkElement
 									.findElement(By.cssSelector("ul.job-list li:nth-of-type(2)")).getText().trim();
+							
+							
+							String city = location.strip().replace("\n", ", ");
+							String formattedCountry = "N/A";
+							formattedCountry = country.substring(0,1).toUpperCase() + country.substring(1).toLowerCase();
 
 							System.out.println(job_title + " | " + location + " | " + contract_type + " | " + job_link);
 
 							List<String> infos = new ArrayList<>();
 							infos.add(job_title.strip());
-							infos.add(location.strip().replace("\n", ", "));
+							infos.add(city);
+							infos.add(formattedCountry);
 							infos.add(contract_type.strip());
 							infos.add("N/A");
 							infos.add("N/A");
@@ -380,17 +395,19 @@ public class AltenJobCollector {
 						JobsOffers jobOffer = new JobsOffers();
 						jobOffer.setTitle(id_jobInfo.get(id).getFirst());
 						jobOffer.setCompany("Alten");
-						jobOffer.setLocation(id_jobInfo.get(id).get(1));
+						jobOffer.setCity(id_jobInfo.get(id).get(1));
+						jobOffer.setCountry(id_jobInfo.get(id).get(2));
 						jobOffer.setUrl(applyLink);
-						jobOffer.setContractType(id_jobInfo.get(id).get(2));
-						jobOffer.setWorkMode(id_jobInfo.get(id).get(3));
-						jobOffer.setPublishDate(id_jobInfo.get(id).get(4));
+						jobOffer.setContractType(id_jobInfo.get(id).get(3));
+						jobOffer.setWorkMode(id_jobInfo.get(id).get(4));
+						jobOffer.setPublishDate(id_jobInfo.get(id).get(5));
 						jobOffer.setPost(jobPostInnerHTML);
 
-						if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+						if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
 								id_jobInfo.get(id).getFirst(), 
 								"Alten", 
 								id_jobInfo.get(id).get(1), 
+								id_jobInfo.get(id).get(2), 
 								applyLink)) {
 							try {
 								jobsOffersRepository.save(jobOffer);
@@ -471,16 +488,18 @@ public class AltenJobCollector {
 							JobsOffers jobOffer = new JobsOffers();
 							jobOffer.setTitle(job_title);
 							jobOffer.setCompany("Alten");
-							jobOffer.setLocation("India");
+							jobOffer.setCity("N/A");
+							jobOffer.setCountry("India");
 							jobOffer.setUrl("N/A");
 							jobOffer.setContractType("N/A");
 							jobOffer.setWorkMode("N/A");
 							jobOffer.setPublishDate("N/A");
 							jobOffer.setPost(jobPostInnerHTML);
 
-							if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+							if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
 									job_title, 
 									"Alten",
+									"N/A",
 									"India", 
 									"N/A")) {
 								try {
@@ -547,12 +566,18 @@ public class AltenJobCollector {
 							String location = element.findElement(By.cssSelector(".card-location .location-list")).getText();
 							String publish_date = element.findElement(By.cssSelector(".card-date .mx-2")).getText().strip();
 
+							
+							String city = location.strip().replace("\n", ", ");
+							String formattedCountry = "N/A";
+							formattedCountry = country.substring(0,1).toUpperCase() + country.substring(1).toLowerCase();
+							
 							System.out.println(job_title + " | " + job_link + " | " + location + " | " + publish_date);
 
 							if (dateCheckValabilityStatus(publish_date)) {
 								List<String> infos = new ArrayList<>();
 								infos.add(job_title.strip());
-								infos.add(location.strip().replace("\n", ", "));
+								infos.add(city);
+								infos.add(formattedCountry);
 								infos.add("N/A");
 								infos.add("N/A");
 								infos.add(publish_date.strip());
@@ -607,18 +632,20 @@ public class AltenJobCollector {
 						JobsOffers jobOffer = new JobsOffers();
 		                jobOffer.setTitle(id_jobInfo.get(id).getFirst());
 		                jobOffer.setCompany("Alten");
-		                jobOffer.setLocation(id_jobInfo.get(id).get(1));
+		                jobOffer.setCity(id_jobInfo.get(id).get(1));
+		                jobOffer.setCountry(id_jobInfo.get(id).get(2));
 		                jobOffer.setUrl(apply_link);
-		                jobOffer.setContractType(id_jobInfo.get(id).get(2));
-		                jobOffer.setWorkMode(id_jobInfo.get(id).get(3));
-		                jobOffer.setPublishDate(id_jobInfo.get(id).get(4));
+		                jobOffer.setContractType(id_jobInfo.get(id).get(3));
+		                jobOffer.setWorkMode(id_jobInfo.get(id).get(4));
+		                jobOffer.setPublishDate(id_jobInfo.get(id).get(5));
 		                jobOffer.setPost(innerHTML);
 
-						if (!jobsOffersRepository.existsByTitleAndCompanyAndLocationAndUrl(
+						if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
 								id_jobInfo.get(id).getFirst(), 
 								"Alten",
-								"India", 
-								"N/A")) {
+								id_jobInfo.get(id).get(1), 
+								id_jobInfo.get(id).get(2),  
+								apply_link)) {
 							try {
 								jobsOffersRepository.save(jobOffer);
 							} catch (DataIntegrityViolationException e) {
