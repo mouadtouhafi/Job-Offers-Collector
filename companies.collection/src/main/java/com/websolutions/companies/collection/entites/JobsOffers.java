@@ -1,10 +1,13 @@
 package com.websolutions.companies.collection.entites;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -51,6 +54,19 @@ public class JobsOffers {
      * */
     @Column(columnDefinition = "TEXT")
     private String post;
+    
+    @Column (name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    /*
+     * @PrePersist is a special JPA annotation that runs automatically before the entity is inserted into the database.
+     * It sets createdAt to the current time when the record is created.
+     * We don’t need to manually set it in our code — it happens automatically when we call save().
+     * */
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     public JobsOffers() {
     	
@@ -150,4 +166,8 @@ public class JobsOffers {
 	public void setPost(String post) {
 		this.post = post;
 	}
+	
+	public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }
