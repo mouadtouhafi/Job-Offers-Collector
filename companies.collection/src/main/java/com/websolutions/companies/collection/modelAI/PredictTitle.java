@@ -1,18 +1,20 @@
 package com.websolutions.companies.collection.modelAI;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Locale;
+
+import org.springframework.stereotype.Service;
 import org.tribuo.Model;
 import org.tribuo.Prediction;
 import org.tribuo.classification.Label;
 import org.tribuo.impl.ArrayExample;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Locale;
-
+@Service
 public class PredictTitle {
 
     @SuppressWarnings("unchecked")
-    public void predictField(String jobTitle) throws Exception {
+    public String predictField(String jobTitle) throws Exception {
 
     	Path modelPath = Paths.get("models", "jobFieldModel.tribuo");
         
@@ -52,5 +54,7 @@ public class PredictTitle {
         System.out.println("Input title: " + jobTitle);
         System.out.println("Predicted class: " + prediction.getOutput().getLabel());
         System.out.println("Class probabilities: " + prediction.getOutputScores());
+        
+        return prediction.getOutput().getLabel();
     }
 }
