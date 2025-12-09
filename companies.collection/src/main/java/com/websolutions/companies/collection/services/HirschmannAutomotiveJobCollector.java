@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
+import com.websolutions.companies.collection.utils.CountryNormalizer;
 
 @Service
 public class HirschmannAutomotiveJobCollector {
@@ -36,10 +37,12 @@ public class HirschmannAutomotiveJobCollector {
     private WebDriver driver;
     private EdgeOptions options;
     private String HirschmannLink = "https://career.hirschmann-automotive.com/en/";
+    private CountryNormalizer countryNormalizer;
 	
-	public HirschmannAutomotiveJobCollector(JobsOffersRepository jobsOffersRepository) {
+	public HirschmannAutomotiveJobCollector(JobsOffersRepository jobsOffersRepository, CountryNormalizer countryNormalizer) {
 		super();
 		this.jobsOffersRepository = jobsOffersRepository;
+		this.countryNormalizer = countryNormalizer;
 	}
 	
 	public void getFulljobs(boolean isFullJobsCollection) throws InterruptedException, MalformedURLException {
@@ -135,6 +138,12 @@ public class HirschmannAutomotiveJobCollector {
 					if(splitLocation.length >= 2) {
 						city = splitLocation[0].strip();
 						country = splitLocation[1].strip();
+						
+						String normalizedCountry = countryNormalizer.find(country.toLowerCase());
+						if(!normalizedCountry.equals("NOT FOUND")) {
+							country = normalizedCountry;
+						}
+						
 					}
 
 					System.out.println(job_link + " | " + job_title + " | " + location + " | " + key);
