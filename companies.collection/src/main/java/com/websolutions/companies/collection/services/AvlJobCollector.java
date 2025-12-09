@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.locations.DetectCities;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
+import com.websolutions.companies.collection.utils.CountryNormalizer;
 
 @Service
 public class AvlJobCollector {
@@ -45,10 +46,12 @@ public class AvlJobCollector {
     private int maxNumberOfPagesClicked = 3;
     private boolean isFinalPageReached = false;
     private String AvlLink = "https://jobs.avl.com/search/?createNewAlert=false&q=&locationsearch=";
+    private CountryNormalizer countryNormalizer;
     
-	public AvlJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities) {
+	public AvlJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities, CountryNormalizer countryNormalizer) {
         this.jobsOffersRepository = jobsOffersRepository;
         this.detectCities = detectCities;
+        this.countryNormalizer = countryNormalizer;
     }
 	
 	public void getFulljobs(boolean isFullJobsCollection) throws IOException, InterruptedException {
@@ -105,6 +108,11 @@ public class AvlJobCollector {
 					Optional<String> detectedCountry = detectCities.getCountryForCity(city);
 					if(detectedCountry.isPresent()) {
 						country = detectedCountry.get();
+						
+						String normalizedCountry = countryNormalizer.find(country.toLowerCase());
+						if(!normalizedCountry.equals("NOT FOUND")) {
+							country = normalizedCountry;
+						}
 					}
 				}
 				
