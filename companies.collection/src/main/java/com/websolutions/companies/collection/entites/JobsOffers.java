@@ -46,6 +46,7 @@ public class JobsOffers {
     private String contractType;
     private String workMode;
     private String publishDate;
+    private String jobField;
     
     /*
      * @Column(columnDefinition = "TEXT") tells Hibernate to store this field as a TEXT column
@@ -73,7 +74,7 @@ public class JobsOffers {
     }
     
 	public JobsOffers(Long id, String title, String company, String city, String country, String url, String contractType,
-			String workMode, String publishDate, String post) {
+			String workMode, String publishDate, String jobField, String post) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -84,6 +85,7 @@ public class JobsOffers {
 		this.contractType = contractType;
 		this.workMode = workMode;
 		this.publishDate = publishDate;
+		this.jobField = jobField;
 		this.post = post;
 	}
 
@@ -157,6 +159,14 @@ public class JobsOffers {
 
 	public void setPublishDate(String publishDate) {
 		this.publishDate = publishDate;
+	}
+	
+	public String getJobField() {
+		return jobField;
+	}
+
+	public void setJobField(String jobField) {
+		this.jobField = jobField;
 	}
 
 	public String getPost() {
