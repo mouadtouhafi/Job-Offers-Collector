@@ -24,7 +24,7 @@ import okhttp3.Response;
 public class DetectCities {
 
     private static final String NOMINATIM_BASE = "https://nominatim.openstreetmap.org/search";
-    private static final String USER_AGENT = "jobs-web/1.0 (contact: mouad-thf1@example.com)";
+    private static final String USER_AGENT = "jobs-web/1.0 (contact: mouad-thfi4@gmail.com)";
     private static final Path JSON_FILE = Paths.get("models/country_cities.json");
 
     
@@ -35,7 +35,7 @@ public class DetectCities {
      * Defining it as a static final field ensures the same client (and its internal connection pool) is reused for all requests, 
      * which is more efficient and considered best practice.
      * */
-    private static final OkHttpClient HTTP = new OkHttpClient.Builder()
+    private static final OkHttpClient HTTP = new OkHttpClient.Builder() 
             .callTimeout(Duration.ofSeconds(20))
             .build();
     
