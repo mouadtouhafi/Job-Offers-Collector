@@ -24,6 +24,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
+import com.websolutions.companies.collection.modelAI.PredictTitle;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 import com.websolutions.companies.collection.utils.CountryNormalizer;
 
@@ -38,11 +39,13 @@ public class HirschmannAutomotiveJobCollector {
     private EdgeOptions options;
     private String HirschmannLink = "https://career.hirschmann-automotive.com/en/";
     private CountryNormalizer countryNormalizer;
+    private PredictTitle predictTitle;
 	
-	public HirschmannAutomotiveJobCollector(JobsOffersRepository jobsOffersRepository, CountryNormalizer countryNormalizer) {
+	public HirschmannAutomotiveJobCollector(JobsOffersRepository jobsOffersRepository, CountryNormalizer countryNormalizer, PredictTitle predictTitle) {
 		super();
 		this.jobsOffersRepository = jobsOffersRepository;
 		this.countryNormalizer = countryNormalizer;
+		this.predictTitle = predictTitle;
 	}
 	
 	public void getFulljobs(boolean isFullJobsCollection) throws InterruptedException, MalformedURLException {
@@ -108,7 +111,6 @@ public class HirschmannAutomotiveJobCollector {
 		try {
 			List<WebElement> domains = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
 					By.cssSelector("section.section-container.page-teaser.type-2 > div > div:nth-child(2) a")));
-			System.out.println(domains.size());
 
 			Map<String, String> domain_link_list = new HashMap<>();
 			for (WebElement domain : domains) {
@@ -119,7 +121,6 @@ public class HirschmannAutomotiveJobCollector {
 
 			Set<String> keys = domain_link_list.keySet();
 			for (String key : keys) {
-				System.out.println(domain_link_list.get(key));
 				driver.get("https://career.hirschmann-automotive.com" + domain_link_list.get(key));
 
 				List<WebElement> jobs = wait.until(ExpectedConditions
@@ -131,8 +132,8 @@ public class HirschmannAutomotiveJobCollector {
 					String job_title = job.findElement(By.cssSelector("h3")).getText();
 					String location = job.findElement(By.cssSelector("p:nth-child(3)")).getText();
 					
-					String city = "N/A";
-					String country = "N/A";
+					String city = "Undefined";
+					String country = "Undefined";
 					
 					String[] splitLocation = location.split("-");
 					if(splitLocation.length >= 2) {
@@ -146,7 +147,6 @@ public class HirschmannAutomotiveJobCollector {
 						
 					}
 
-					System.out.println(job_link + " | " + job_title + " | " + location + " | " + key);
 					List<String> infos = new ArrayList<>();
 					infos.add(job_title.strip());
 					infos.add(city);
@@ -156,7 +156,6 @@ public class HirschmannAutomotiveJobCollector {
 					jobsLinks.put(jobIndex, job_link);
 					jobIndex++;
 				}
-				System.out.println();
 
 			}
 
@@ -168,16 +167,13 @@ public class HirschmannAutomotiveJobCollector {
 					List<WebElement> innerHTMLElements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
 							By.cssSelector("section.job-detail-container div.left-col > div")));
 					for (WebElement innerHTMLElement : innerHTMLElements) {
-						innerHTML = innerHTML + innerHTMLElement.getDomProperty("innerHTML").replace("\n", "");
+						innerHTML = innerHTML + innerHTMLElement.getDomProperty("innerHTML").replace("\n", "").replaceAll("(?i)<p>(\\s|&nbsp;|&#160;|<br\\s*/?>)*</p>","");
 					}
 
 					String apply_link = driver
 							.findElement(By.cssSelector("section.job-detail-container div.left-col > a"))
 							.getDomAttribute("href");
 
-					System.out.println("\n\n" + "  " + id + "  :  " + innerHTML);
-					System.out.println(apply_link);
-					System.out.println();
 					
 					JobsOffers jobOffer = new JobsOffers();
 	                jobOffer.setTitle(id_jobInfo.get(id).getFirst());
@@ -185,9 +181,10 @@ public class HirschmannAutomotiveJobCollector {
 	                jobOffer.setCity(id_jobInfo.get(id).get(1));
 	                jobOffer.setCountry(id_jobInfo.get(id).get(2));
 	                jobOffer.setUrl(apply_link);
-	                jobOffer.setContractType("N/A");
-	                jobOffer.setWorkMode("N/A");
-	                jobOffer.setPublishDate("N/A");
+	                jobOffer.setContractType("Undefined");
+	                jobOffer.setWorkMode("Undefined");
+	                jobOffer.setPublishDate("Undefined");
+	                jobOffer.setJobField(predictTitle.predictField(id_jobInfo.get(id).getFirst()).replace(" / ", " - "));
 	                jobOffer.setPost(innerHTML);
 	                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
 	                		id_jobInfo.get(id).getFirst(), 

@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.locations.DetectCities;
+import com.websolutions.companies.collection.modelAI.PredictTitle;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
 import com.websolutions.companies.collection.utils.CountryNormalizer;
 
@@ -47,11 +48,13 @@ public class AvlJobCollector {
     private boolean isFinalPageReached = false;
     private String AvlLink = "https://jobs.avl.com/search/?createNewAlert=false&q=&locationsearch=";
     private CountryNormalizer countryNormalizer;
+    private PredictTitle predictTitle;
     
-	public AvlJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities, CountryNormalizer countryNormalizer) {
+	public AvlJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities, CountryNormalizer countryNormalizer, PredictTitle predictTitle) {
         this.jobsOffersRepository = jobsOffersRepository;
         this.detectCities = detectCities;
         this.countryNormalizer = countryNormalizer;
+        this.predictTitle = predictTitle;
     }
 	
 	public void getFulljobs(boolean isFullJobsCollection) throws IOException, InterruptedException {
@@ -99,8 +102,8 @@ public class AvlJobCollector {
 						   job.findElement(By.cssSelector("td.colTitle span.jobTitle a"))
 						   .getDomAttribute("href");
 				
-				String city = "N/A";
-				String country = "N/A";
+				String city = "Undefined";
+				String country = "Undefined";
 				Pattern pattern = Pattern.compile("^(.+?),\\s*[A-Z]{2}$");
 				Matcher matcher = pattern.matcher(location);
 				if(matcher.find()) {
@@ -134,7 +137,6 @@ public class AvlJobCollector {
 						By.cssSelector("div.pagination-well ul.pagination li")
 					);
 				
-				System.out.println("\n" + btnList.size());
 				if (btnList.isEmpty()) {
 					isFinalPageReached = true;
 				} else {
@@ -142,7 +144,6 @@ public class AvlJobCollector {
 					btnList.remove(0);
 					for (int i = 0; i < btnList.size(); i++) {
 						String cssClass = btnList.get(i).getDomAttribute("class");
-						System.out.println("cssClass : "+cssClass);
 						
 						if (cssClass.contains("active")) {
 							if (i + 1 < btnList.size()) {
@@ -152,7 +153,6 @@ public class AvlJobCollector {
 								if(isFullJobsCollection == false && maxNumberOfPagesClicked == 0) {
 									isFinalPageReached = true;
 								}
-								System.out.println("page clicked");
 
 			                    wait.until(ExpectedConditions.stalenessOf(jobs.getFirst()));
 							} else {
@@ -176,20 +176,20 @@ public class AvlJobCollector {
 				WebElement innerHTMLContainer = wait.until(ExpectedConditions.presenceOfElementLocated(
 						By.cssSelector("span.jobdescription")
 					));
-				innerHTML = innerHTMLContainer.getDomProperty("innerHTML");
+				innerHTML = innerHTMLContainer.getDomProperty("innerHTML")
+						.replace("\n", "")
+						.replaceAll("(?i)<p>(\\s|&nbsp;|&#160;|<br\\s*/?>)*</p>","");
 				
 				List<WebElement> extraInfosContainer = driver.findElements(By.cssSelector("div.jobColumnTwo div.joblayouttoken"));
-				String job_domain = extraInfosContainer.get(2).findElement(By.cssSelector("div.row span:nth-child(2)")).getText();
+				//String job_domain = extraInfosContainer.get(2).findElement(By.cssSelector("div.row span:nth-child(2)")).getText();
 				String contract_type = extraInfosContainer.get(3).findElement(By.cssSelector("div.row span:nth-child(2)")).getText();
+				if(contract_type.isBlank()) {
+					contract_type = "Undefined";
+				}
 				
 				String apply_link = "https://jobs.avl.com" + driver.findElement(
 						By.cssSelector("div.jobTitle div.btn-social-apply .btn-primary"))
 						.getDomAttribute("href");
-					
-				
-				System.out.println("\n\n"+"  "+id+"  :  "+innerHTML);
-				System.out.println(apply_link);
-				System.out.println(job_domain);
 				
 				
 				JobsOffers jobOffer = new JobsOffers();
@@ -199,8 +199,9 @@ public class AvlJobCollector {
                 jobOffer.setCountry(id_jobInfo.get(id).get(2));
                 jobOffer.setUrl(apply_link);
                 jobOffer.setContractType(contract_type);
-                jobOffer.setWorkMode("N/A");
+                jobOffer.setWorkMode("Undefined");
                 jobOffer.setPublishDate(id_jobInfo.get(id).get(3));
+                jobOffer.setJobField(predictTitle.predictField(id_jobInfo.get(id).getFirst()).replace(" / ", " - "));
                 jobOffer.setPost(innerHTML);
                 if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 
@@ -208,7 +209,6 @@ public class AvlJobCollector {
                 		id_jobInfo.get(id).get(1),
                 		id_jobInfo.get(id).get(2),
                 		apply_link)){
-                	
                 	try {
                 		jobsOffersRepository.save(jobOffer);
 					} catch (DataIntegrityViolationException e) {

@@ -1,5 +1,8 @@
 package com.websolutions.companies.collection.services;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
@@ -27,7 +30,9 @@ import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
 import com.websolutions.companies.collection.locations.DetectCities;
+import com.websolutions.companies.collection.modelAI.PredictTitle;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
+import com.websolutions.companies.collection.utils.CountryNormalizer;
 
 @Service
 public class ApsideJobCollector {
@@ -41,11 +46,15 @@ public class ApsideJobCollector {
     private int maxNumberOfPagesClicked = 3;
     boolean isFinalPageReached = false;
     private final DetectCities detectCities;
+    private CountryNormalizer countryNormalizer;
+    private PredictTitle predictTitle;
 	
-	public ApsideJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities) {
+	public ApsideJobCollector(JobsOffersRepository jobsOffersRepository, DetectCities detectCities, CountryNormalizer countryNormalizer, PredictTitle predictTitle) {
 		super();
 		this.jobsOffersRepository = jobsOffersRepository;
 		this.detectCities = detectCities;
+		this.countryNormalizer = countryNormalizer;
+        this.predictTitle = predictTitle;
 	}
 	
 	public void getFulljobs(boolean isFullJobsCollection) throws IOException, InterruptedException {
@@ -72,18 +81,14 @@ public class ApsideJobCollector {
 		if (!popupAppearedAndClosed) {
 			/* Check if popup cookies is appearing */
 			try {
-				 //driver.switchTo().frame("iFrame1");
 				 WebElement closeBtn = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("tarteaucitronPersonalize2")));
 				 safeClick(driver, closeBtn);
-				 
-				 //driver.switchTo().defaultContent();
 			} catch (TimeoutException e) {
 				e.printStackTrace();
 			}
 			popupAppearedAndClosed = true;
 		}
 		
-		// The website acts weirdly, we must reload the page by clicking the first button page in the pagination nav.
 		boolean isFirstPageReloaded = false;
 		if (!isFirstPageReloaded) {
 			try {
@@ -105,7 +110,6 @@ public class ApsideJobCollector {
 					By.cssSelector("main.main section[class*='joboffergrid'] div.bp12-joboffergrid__posts div.card-list__item"))
 				);
 			
-			System.out.println(jobs.size());
 			for(WebElement job : jobs) {
 				String job_title = job.findElement(
 						By.cssSelector("div.card-job-offer__content h3.card-job-offer__title"))
@@ -114,8 +118,8 @@ public class ApsideJobCollector {
 				List<WebElement> span_infos = job.findElements(By.cssSelector("div.card-job-offer__content div.card-job-offer__tags > span"));
 				
 				String publish_date = span_infos.getFirst().getText();
-				String contract_type= "N/A";
-				String location = "N/A";
+				String contract_type= "Undefined";
+				String location = "Undefined";
 				for(int j=1; j<span_infos.size(); j++) {
 					String text = span_infos.get(j).getText().toUpperCase();
 					if(text.contains("TEMPS PLEIN") || 
@@ -129,22 +133,22 @@ public class ApsideJobCollector {
 					}
 				}
 				
-				String city = "N/A";
-				String country = "N/A";
-				if(!location.equals("N/A")) {
+				String city = "Undefined";
+				String country = "Undefined";
+				if(!location.equals("Undefined")) {
 					city = location;
 					Optional<String> detectedCountry = detectCities.getCountryForCity(city);
 					if(detectedCountry.isPresent()) {
 						country = detectedCountry.get();
+						
+						String normalizedCountry = countryNormalizer.find(country.toLowerCase());
+						if(!normalizedCountry.equals("NOT FOUND")) {
+							country = normalizedCountry;
+						}
 					}
 				}
 				
-				String job_link = job.findElement(By.tagName("a")).getDomAttribute("href");
-				
-				System.out.println(publish_date+"  |  "+ contract_type + "  |  "+location);
-				
-				
-				System.out.println(dateCheckValabilityStatus(publish_date));
+				String job_link = job.findElement(By.tagName("a")).getDomAttribute("href");			
 				if(dateCheckValabilityStatus(publish_date)) {
 					List<String> infos = new ArrayList<>();
 					infos.add(job_title.strip());
@@ -168,7 +172,6 @@ public class ApsideJobCollector {
 					); 
 				
 				if (btnList.isEmpty()) {
-					System.out.println("================================================================>  button is empty" );
 					isFinalPageReached = true;
 				}else {
 					btnList.removeLast();
@@ -176,8 +179,7 @@ public class ApsideJobCollector {
 					for (int i = 0; i < btnList.size(); i++) {
 						WebElement btn = btnList.get(i);
 						String cssClass = btn.getDomAttribute("class");
-						System.out.println(cssClass);
-//
+
 						if (cssClass.contains("active")) {
 							if (i + 1 < btnList.size()) {
 								WebElement nextBtn = btnList.get(i + 1);
@@ -186,11 +188,8 @@ public class ApsideJobCollector {
 								if(isFullJobsCollection == false && maxNumberOfPagesClicked == 0) {
 									isFinalPageReached = true;
 								}
-								System.out.println("page clicked");
-
-			                    //wait.until(ExpectedConditions.stalenessOf(jobs.getFirst()));
 							} else {
-								isFinalPageReached = true; // active button is last page
+								isFinalPageReached = true;
 							}
 							break;
 						}
@@ -209,21 +208,18 @@ public class ApsideJobCollector {
 				
 				String innerHTMLMissions = wait.until(ExpectedConditions.presenceOfElementLocated(
 						By.cssSelector("div[class*='jobmaindesc__text']")))
-						  .getDomProperty("innerHTML").replace("\n", "");
+						  .getDomProperty("innerHTML").replace("\n", "")
+						  .replaceAll("(?i)<p>(\\s|&nbsp;|&#160;|<br\\s*/?>)*</p>","");
 				
 				String innerHTMLQualifications = wait.until(ExpectedConditions.presenceOfElementLocated(
 						By.cssSelector("div[class*='jobrequirements__content']")))
-						  .getDomProperty("innerHTML").replace("\n", "");
+						  .getDomProperty("innerHTML").replace("\n", "")
+						  .replaceAll("(?i)<p>(\\s|&nbsp;|&#160;|<br\\s*/?>)*</p>","");
 				
-				String innerHTML = innerHTMLMissions + innerHTMLQualifications;
-				//System.out.println(innerHTML);
-				
+				String innerHTML = innerHTMLMissions + innerHTMLQualifications;				
 			
 				String apply_link = jobsLinks.get(id);
 					
-				System.out.println(apply_link);
-				System.out.println();
-				
 				JobsOffers jobOffer = new JobsOffers();
                 jobOffer.setTitle(id_jobInfo.get(id).getFirst());
                 jobOffer.setCompany("Apside");
@@ -231,8 +227,9 @@ public class ApsideJobCollector {
                 jobOffer.setCountry(id_jobInfo.get(id).get(4));
                 jobOffer.setUrl(apply_link);
                 jobOffer.setContractType(id_jobInfo.get(id).get(1));
-                jobOffer.setWorkMode("N/A");
+                jobOffer.setWorkMode("Undefined");
                 jobOffer.setPublishDate(id_jobInfo.get(id).get(2));
+                jobOffer.setJobField(predictTitle.predictField(id_jobInfo.get(id).getFirst()).replace(" / ", " - "));
                 jobOffer.setPost(innerHTML);
                 if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 
@@ -253,13 +250,19 @@ public class ApsideJobCollector {
 			}
 			
 		}
+		
 		driver.quit();
-		
-		
+		File file = new File("Collector-checker.txt");
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+		    if (file.length() > 0) {
+		        writer.newLine();
+		    }
+		    writer.write(this.getClass().getName());
+		}
 	}
 	
 	public boolean dateCheckValabilityStatus(String date_to_check) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // match your format
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); 
 		LocalDate inputDate = null;
 		try {
 			inputDate = LocalDate.parse(date_to_check, formatter);

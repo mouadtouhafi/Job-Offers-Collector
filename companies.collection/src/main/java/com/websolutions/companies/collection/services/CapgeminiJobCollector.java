@@ -22,7 +22,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
+import com.websolutions.companies.collection.modelAI.PredictTitle;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
+import com.websolutions.companies.collection.utils.CountryNormalizer;
 
 @Service
 public class CapgeminiJobCollector {
@@ -34,10 +36,14 @@ public class CapgeminiJobCollector {
     private final JobsOffersRepository jobsOffersRepository;
     private EdgeOptions options;
     boolean isFinalPageReached = false;
+    private CountryNormalizer countryNormalizer;
+    private PredictTitle predictTitle;
   
-	public CapgeminiJobCollector(JobsOffersRepository jobsOffersRepository) {
+	public CapgeminiJobCollector(JobsOffersRepository jobsOffersRepository, CountryNormalizer countryNormalizer, PredictTitle predictTitle) {
 		super();
 		this.jobsOffersRepository = jobsOffersRepository;
+		this.countryNormalizer = countryNormalizer;
+        this.predictTitle = predictTitle;
 	}
 
 	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
@@ -86,11 +92,15 @@ public class CapgeminiJobCollector {
 			List<WebElement> job_details = job.findElements(By.cssSelector(".table-td"));
 			String job_title = job_details.get(0).findElement(By.tagName("div")).getText();
 			String country = job_details.get(1).findElement(By.tagName("div")).getText();
+			
+			String normalizedCountry = countryNormalizer.find(country.toLowerCase());
+			if(!normalizedCountry.equals("NOT FOUND")) {
+				country = normalizedCountry;
+			}
+			
 			String city = job_details.get(2).findElement(By.tagName("div")).getText();
 			String contract_type = job_details.get(5).findElement(By.tagName("div")).getText();
 			String job_link = job.getDomAttribute("href");
-			System.out.println(
-					job_title + "  |  " + country + "  |  " + city + "  |  " + contract_type + "  |  " + job_link);
 
 			
 			List<String> infos = new ArrayList<>();
@@ -98,8 +108,8 @@ public class CapgeminiJobCollector {
 			infos.add(city.strip().replace("\n", ", "));
 			infos.add(country.strip().replace("\n", ", "));
 			infos.add(contract_type.strip());
-			infos.add("N/A");
-			infos.add("N/A");
+			infos.add("Undefined");
+			infos.add("Undefined");
 
 			id_jobInfo.put(jobIndex, infos);
 			jobsLinks.put(jobIndex, job_link);
@@ -112,13 +122,11 @@ public class CapgeminiJobCollector {
 				String innerHTML = "";
 				WebElement innerHTMLContainer = wait.until(ExpectedConditions
 						.presenceOfElementLocated(By.cssSelector("section.section--job-info div.article-text")));
-				innerHTML = innerHTMLContainer.getDomProperty("innerHTML");
+				innerHTML = innerHTMLContainer.getDomProperty("innerHTML").replace("\n", "").replaceAll("(?i)<p>(\\s|&nbsp;|&#160;|<br\\s*/?>)*</p>","");;
 				String apply_link = driver
 						.findElement(By.cssSelector("section.section--job-info div.job-meta-box a.cta-link"))
 						.getDomAttribute("href");
 
-				System.out.println("\n\n" + "  " + id + "  :  " + innerHTML);
-				System.out.println(apply_link);
 				
 				JobsOffers jobOffer = new JobsOffers();
                 jobOffer.setTitle(id_jobInfo.get(id).getFirst());
@@ -127,8 +135,9 @@ public class CapgeminiJobCollector {
                 jobOffer.setCountry(id_jobInfo.get(id).get(2));
                 jobOffer.setUrl(apply_link);
                 jobOffer.setContractType(id_jobInfo.get(id).get(3));
-                jobOffer.setWorkMode("N/A");
-                jobOffer.setPublishDate("N/A");
+                jobOffer.setWorkMode("Undefined");
+                jobOffer.setPublishDate("Undefined");
+                jobOffer.setJobField(predictTitle.predictField(id_jobInfo.get(id).getFirst()).replace(" / ", " - "));
                 jobOffer.setPost(innerHTML);
                 if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
                 		id_jobInfo.get(id).getFirst(), 

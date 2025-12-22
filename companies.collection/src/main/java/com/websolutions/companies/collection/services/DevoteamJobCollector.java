@@ -22,43 +22,46 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.websolutions.companies.collection.entites.JobsOffers;
+import com.websolutions.companies.collection.modelAI.PredictTitle;
 import com.websolutions.companies.collection.repositories.JobsOffersRepository;
+import com.websolutions.companies.collection.utils.CountryNormalizer;
 
 @Service
 public class DevoteamJobCollector {
 	private static final Logger logger = Logger.getLogger(ExpleoJobCollector.class.getName());
-    private final HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
-    private final HashMap<Integer, String> jobsLinks = new HashMap<>();
-    private final JobsOffersRepository jobsOffersRepository;
-    private WebDriver driver;
-    private EdgeOptions options;
-    private String DevoteamLink = "https://www.devoteam.com/fr/jobs/";
-    private int maxNumberOfPagesClicked = 1;
-    boolean isFinalPageReached = false;
-	
-	public DevoteamJobCollector(JobsOffersRepository jobsOffersRepository) {
+	private final HashMap<Integer, List<String>> id_jobInfo = new HashMap<>();
+	private final HashMap<Integer, String> jobsLinks = new HashMap<>();
+	private final JobsOffersRepository jobsOffersRepository;
+	private WebDriver driver;
+	private EdgeOptions options;
+	private String DevoteamLink = "https://www.devoteam.com/fr/jobs/";
+	private int maxNumberOfPagesClicked = 1;
+	boolean isFinalPageReached = false;
+	private CountryNormalizer countryNormalizer;
+	private PredictTitle predictTitle;
+
+	public DevoteamJobCollector(JobsOffersRepository jobsOffersRepository, CountryNormalizer countryNormalizer,
+			PredictTitle predictTitle) {
 		super();
 		this.jobsOffersRepository = jobsOffersRepository;
+		this.countryNormalizer = countryNormalizer;
+		this.predictTitle = predictTitle;
 	}
-	
+
 	public void getFulljobs(boolean isFullJobsCollection) throws MalformedURLException {
 		int jobIndex = 0;
-		
 
 		options = new EdgeOptions();
-        options.addArguments("--no-sandbox");
-        options.addArguments("--headless=new");
+		options.addArguments("--no-sandbox");
+		options.addArguments("--headless=new");
 		options.addArguments("--disable-dev-shm-usage");
 		options.addArguments("--lang=en-US");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--disable-notifications");
-        options.addArguments("--window-size=1920,1080");
-		
-        driver = new RemoteWebDriver(
-        		URI.create("http://selenium:4444").toURL(),
-        	    options
-        	);
-        
+		options.addArguments("--disable-gpu");
+		options.addArguments("--disable-notifications");
+		options.addArguments("--window-size=1920,1080");
+
+		driver = new RemoteWebDriver(URI.create("http://selenium:4444").toURL(), options);
+
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
 		driver.get(DevoteamLink);
@@ -66,8 +69,6 @@ public class DevoteamJobCollector {
 		boolean popupAppearedAndClosed = false;
 		if (!popupAppearedAndClosed) {
 			try {
-				// The accept cookie button is inside a shadow DOM, we Wait for the shadow host
-
 				WebElement acceptBtn = wait
 						.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("button.button-accept-all")));
 
@@ -95,8 +96,6 @@ public class DevoteamJobCollector {
 					}
 
 					String job_link = job.findElement(By.cssSelector("div.wrapper a")).getDomAttribute("href");
-
-					System.out.println(job_title + "  |  " + contract_type + "  |  " + job_link);
 
 					List<String> infos = new ArrayList<>();
 					infos.add(job_title.strip());
@@ -139,60 +138,58 @@ public class DevoteamJobCollector {
 		for (int id = 0; id < jobsLinks.size(); id++) {
 			try {
 				driver.get(jobsLinks.get(id));
-				
-				String location = wait.until(ExpectedConditions.presenceOfElementLocated(
-								By.cssSelector("div.wp-block-acf-post-header div.wp-block-group p")))
-								.getText().strip();
-				
-				String city = "N/A";
-				String country = "N/A";
-				
+
+				String location = wait.until(ExpectedConditions
+						.presenceOfElementLocated(By.cssSelector("div.wp-block-acf-post-header div.wp-block-group p")))
+						.getText().strip();
+
+				String city = "Undefined";
+				String country = "Undefined";
+
 				String[] splitLocation = location.split("•");
-				if(splitLocation.length >= 2) {
+				if (splitLocation.length >= 2) {
 					city = splitLocation[0].strip();
 					country = splitLocation[1].strip();
+
+					String normalizedCountry = countryNormalizer.find(country.toLowerCase());
+					if (!normalizedCountry.equals("NOT FOUND")) {
+						country = normalizedCountry;
+					}
 				}
-				List<WebElement> innerHTMLPostElements = driver.findElements(By.cssSelector("div.entry-content.wp-block-post-content div.description"));
+				List<WebElement> innerHTMLPostElements = driver
+						.findElements(By.cssSelector("div.entry-content.wp-block-post-content div.description"));
 				String innerHTML = "";
-				for(WebElement element : innerHTMLPostElements) {
-					innerHTML = innerHTML + element.getDomProperty("innerHTML").replace("\n", "").replaceAll("<img[^>]*>", "");
+				for (WebElement element : innerHTMLPostElements) {
+					innerHTML = innerHTML + element.getDomProperty("innerHTML")
+						.replace("\n", "")
+						.replaceAll("<img[^>]*>", "")
+						.replaceAll("(?i)<p>(\\s|&nbsp;|&#160;|<br\\s*/?>)*</p>","");
 				}
 
-				System.out.println(innerHTML);
+				String apply_link = driver
+						.findElements(By.cssSelector("div.entry-content.wp-block-post-content div.wp-block-buttons a"))
+						.getFirst().getDomAttribute("href");
 
-				String apply_link = driver.findElements(
-									By.cssSelector("div.entry-content.wp-block-post-content div.wp-block-buttons a"))
-									.getFirst()
-									.getDomAttribute("href");
-
-				System.out.println(apply_link);
-				System.out.println(location);
-				System.out.println();
-				
-				
 				JobsOffers jobOffer = new JobsOffers();
-                jobOffer.setTitle(id_jobInfo.get(id).getFirst());
-                jobOffer.setCompany("Devoteam");
-                jobOffer.setCity(city);
-                jobOffer.setCountry(country);
-                jobOffer.setUrl(apply_link);
-                jobOffer.setContractType(id_jobInfo.get(id).get(1));
-                jobOffer.setWorkMode("N/A");
-                jobOffer.setPublishDate("N/A");
-                jobOffer.setPost(innerHTML);
-                if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(
-                		id_jobInfo.get(id).getFirst(), 
-                		"Devoteam", 
-                		city,
-                		country,
-                		apply_link)){
-                	
-                	try {
-                		jobsOffersRepository.save(jobOffer);
+				jobOffer.setTitle(id_jobInfo.get(id).getFirst());
+				jobOffer.setCompany("Devoteam");
+				jobOffer.setCity(city);
+				jobOffer.setCountry(country);
+				jobOffer.setUrl(apply_link);
+				jobOffer.setContractType(id_jobInfo.get(id).get(1));
+				jobOffer.setWorkMode("Undefined");
+				jobOffer.setPublishDate("Undefined");
+				jobOffer.setJobField(predictTitle.predictField(id_jobInfo.get(id).getFirst()).replace(" / ", " - "));
+				jobOffer.setPost(innerHTML);
+				if (!jobsOffersRepository.existsByTitleAndCompanyAndCityAndCountryAndUrl(id_jobInfo.get(id).getFirst(),
+						"Devoteam", city, country, apply_link)) {
+
+					try {
+						jobsOffersRepository.save(jobOffer);
 					} catch (DataIntegrityViolationException e) {
 						logger.info("Duplicate detected: " + jobOffer.getTitle() + " @ " + jobOffer.getUrl());
 					}
-                }
+				}
 			} catch (Exception e) {
 				System.out.println(
 						"⚠️ Unexpected error at job " + id + " (" + jobsLinks.get(id) + "): " + e.getMessage());
