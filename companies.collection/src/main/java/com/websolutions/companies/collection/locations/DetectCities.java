@@ -71,11 +71,11 @@ public class DetectCities {
     public Optional<String> getCountryForCity(String userCity) throws IOException, InterruptedException {
         String city = normalizeCity(userCity);
         if (city.isEmpty()) {
-            System.out.println("⚠️ Empty city name received.");
+            /* System.out.println("⚠️ Empty city name received."); */
             return Optional.empty();
         }
 
-        System.out.println("\n🔎 Looking up city: " + city);
+        /* System.out.println("\n🔎 Looking up city: " + city); */
         String lower = city.toLowerCase(Locale.ROOT);
 
         /*
@@ -83,7 +83,7 @@ public class DetectCities {
          * which is a HashMap named CACHE_CITY_TO_COUNTRY.
          * */
         if (CACHE_CITY_TO_COUNTRY.containsKey(lower)) {
-            System.out.println("✅ Found in in-memory cache.");
+        	/* System.out.println("✅ Found in in-memory cache."); */
             return Optional.ofNullable(CACHE_CITY_TO_COUNTRY.get(lower));
         }
 
@@ -130,10 +130,10 @@ public class DetectCities {
         String country = CITY_TO_COUNTRY_INDEX.get(lower);
 
         if (country != null) {
-            System.out.println("✅ Local JSON hit: " + city + " -> " + country);
+            /* System.out.println("✅ Local JSON hit: " + city + " -> " + country); */
             return Optional.of(country);
         } else {
-            System.out.println("ℹ️ Local JSON miss for: " + city);
+            /* System.out.println("ℹ️ Local JSON miss for: " + city); */
             return Optional.empty();
         }
     }
@@ -146,7 +146,7 @@ public class DetectCities {
         String city = normalizeCity(userCity);
         if (city.isEmpty()) return Optional.empty();
 
-        System.out.println("🌐 Querying Nominatim for: " + city);
+        /* System.out.println("🌐 Querying Nominatim for: " + city); */
         TimeUnit.MILLISECONDS.sleep(1100);
 
         HttpUrl url = HttpUrl.parse(NOMINATIM_BASE).newBuilder()
@@ -164,16 +164,16 @@ public class DetectCities {
 
         try (Response resp = HTTP.newCall(request).execute()) {
             if (!resp.isSuccessful() || resp.body() == null) {
-                System.out.println("❌ HTTP request failed with code: " + resp.code());
+                /* System.out.println("❌ HTTP request failed with code: " + resp.code()); */
                 return Optional.empty();
             }
             NominatimResult[] results = MAPPER.readValue(resp.body().bytes(), NominatimResult[].class);
             if (results.length == 0 || results[0].address == null) {
-                System.out.println("❌ No results from API for: " + city);
+                /* System.out.println("❌ No results from API for: " + city); */
                 return Optional.empty();
             }
             String country = results[0].address.country;
-            System.out.println("🌍 API result: " + city + " -> " + country);
+            /* System.out.println("🌍 API result: " + city + " -> " + country); */
             return Optional.ofNullable(country);
         }
     }
@@ -207,14 +207,14 @@ public class DetectCities {
      * */
     private static synchronized void ensureIndexLoaded() throws IOException {
         if (COUNTRY_TO_CITIES == null) {
-            System.out.println("📂 Loading local JSON file...");
+            /* System.out.println("📂 Loading local JSON file..."); */
             COUNTRY_TO_CITIES = readCountryCitiesFile(JSON_FILE);
-            System.out.println("✅ Loaded " + COUNTRY_TO_CITIES.size() + " countries.");
+            /* System.out.println("✅ Loaded " + COUNTRY_TO_CITIES.size() + " countries."); */
         }
         if (CITY_TO_COUNTRY_INDEX == null) {
-            System.out.println("🧠 Building in-memory index...");
+            /* System.out.println("🧠 Building in-memory index..."); */
             CITY_TO_COUNTRY_INDEX = buildCityToCountryIndex(COUNTRY_TO_CITIES);
-            System.out.println("✅ Indexed " + CITY_TO_COUNTRY_INDEX.size() + " cities.");
+            /* System.out.println("✅ Indexed " + CITY_TO_COUNTRY_INDEX.size() + " cities."); */
         }
     }
 
@@ -227,7 +227,7 @@ public class DetectCities {
      * */
     private static Map<String, List<String>> readCountryCitiesFile(Path file) throws IOException {
         if (!Files.exists(file)) {
-            System.out.println("⚠️ No JSON file found, starting with empty dataset.");
+            /* System.out.println("⚠️ No JSON file found, starting with empty dataset."); */
             return new TreeMap<>();
         }
         return MAPPER.readValue(file.toFile(), new TypeReference<TreeMap<String, List<String>>>() {});
@@ -301,9 +301,9 @@ public class DetectCities {
             ensureParentDir(JSON_FILE);
             MAPPER.writerWithDefaultPrettyPrinter().writeValue(JSON_FILE.toFile(), COUNTRY_TO_CITIES);
 
-            System.out.println("💾 Persisted to JSON: \"" + city + "\" under \"" + country + "\".");
+            /* System.out.println("💾 Persisted to JSON: \"" + city + "\" under \"" + country + "\"."); */
         } else {
-            System.out.println("ℹ️ City already exists under " + country + " in JSON.");
+            /* System.out.println("ℹ️ City already exists under " + country + " in JSON."); */
         }
     }
 

@@ -354,8 +354,8 @@ public class CityToCountry {
         File outFile = new File(path.toString());
         MAPPER.writerWithDefaultPrettyPrinter().writeValue(outFile, output);
 
-        System.out.println("Wrote JSON to: " + outFile.getAbsolutePath());
-        System.out.println("Countries: " + output.size());
+        /* System.out.println("Wrote JSON to: " + outFile.getAbsolutePath()); */
+        /* System.out.println("Countries: " + output.size()); */
         output.forEach((ctry, cities) ->
                 System.out.println(ctry + " -> " + cities.size() + " cities"));
     }
