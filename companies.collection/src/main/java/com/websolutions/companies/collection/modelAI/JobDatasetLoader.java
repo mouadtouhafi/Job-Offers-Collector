@@ -110,9 +110,12 @@ public class JobDatasetLoader {
          * - The two counters record how many rows are skipped because of missing values or because no valid features were found.
          * */
         String line;
-        int lineNumber = 1; // we already consumed header, which was line 1
-        int droppedEmptyFeature = 0;
-        int droppedMissingValue = 0;
+        @SuppressWarnings("unused")
+		int lineNumber = 1; // we already consumed header, which was line 1
+        @SuppressWarnings("unused")
+		int droppedEmptyFeature = 0;
+        @SuppressWarnings("unused")
+		int droppedMissingValue = 0;
         
         
         /* This loop reads each remaining line in the CSV file one by one until there are no more lines left. */
@@ -120,7 +123,7 @@ public class JobDatasetLoader {
             lineNumber++;
 
             if (line.isBlank()) {
-                System.out.println("[DEBUG] Skipping blank line at CSV line " + lineNumber);
+                /* System.out.println("[DEBUG] Skipping blank line at CSV line " + lineNumber); */
                 continue;
             }
 
@@ -132,7 +135,7 @@ public class JobDatasetLoader {
              * */
             String[] cols = line.split(",", -1);
             if (cols.length <= Math.max(titleIdx, fieldIdx)) {
-                System.out.println("[DEBUG] Skipping malformed row at line " + lineNumber + " (not enough columns)");
+                /* System.out.println("[DEBUG] Skipping malformed row at line " + lineNumber + " (not enough columns)"); */
                 continue;
             }
             
@@ -145,8 +148,7 @@ public class JobDatasetLoader {
             String field = cols[fieldIdx].trim().replaceAll("^\"|\"$", "");
 
             if (title.isEmpty() || field.isEmpty()) {
-                System.out.println("[DEBUG] Dropped row " + lineNumber +
-                        " because title or field was empty. title='" + title + "' field='" + field + "'");
+                /* System.out.println("[DEBUG] Dropped row " + lineNumber + " because title or field was empty. title='" + title + "' field='" + field + "'"); */
                 droppedMissingValue++;
                 continue;
             }
@@ -166,8 +168,7 @@ public class JobDatasetLoader {
              * Otherwise, the example is added to the result list.
              * */
             if (ex == null) {
-                System.out.println("[DEBUG] Dropped row " + lineNumber +
-                        " because no valid features were produced from title='" + title + "'");
+                /* System.out.println("[DEBUG] Dropped row " + lineNumber + " because no valid features were produced from title='" + title + "'"); */
                 droppedEmptyFeature++;
             } else {
                 result.add(ex);
@@ -180,10 +181,12 @@ public class JobDatasetLoader {
          * */
         br.close();
 
+        /*
         System.out.println("[DEBUG] Summary:");
         System.out.println("[DEBUG] Total kept examples: " + result.size());
         System.out.println("[DEBUG] Dropped (missing title/field): " + droppedMissingValue);
         System.out.println("[DEBUG] Dropped (no usable features after tokenization): " + droppedEmptyFeature);
+        */
 
         return result;
     }

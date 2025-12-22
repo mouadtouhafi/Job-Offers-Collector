@@ -34,7 +34,7 @@ public class TrainAndSave {
          * 	csvPath: the location of the dataset (a CSV file with job data).
          * 	modelPath: where to save the trained model after training (at the very bottom).
          * */
-    	Path csvPath = Paths.get("models/jobs.csv");
+    	Path csvPath = Paths.get("models/job-field table.csv");
     	
         
         /* Loading all labeled examples from our CSV */
@@ -264,4 +264,9 @@ public class TrainAndSave {
         model.serializeToFile(Paths.get(modelPath.toString()));
         System.out.println("Saved model to " + modelPath);
     }
+    
+    public static void main(String[] args) throws Exception {
+		TrainAndSave trainAndSave = new TrainAndSave();
+		trainAndSave.trainData();
+	}
 }

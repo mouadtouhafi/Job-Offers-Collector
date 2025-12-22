@@ -46,15 +46,25 @@ public class PredictTitle {
             if (tok == null || tok.isEmpty()) continue;
             example.add("tok=" + tok, 1.0);
         }
+        
+        if (example.size() == 0) {
+            return "Others";
+        }
 
         /* Running the prediction */
-        Prediction<Label> prediction = loadedModel.predict(example);
-
         
+        try {
+            Prediction<Label> prediction = loadedModel.predict(example);
+            return prediction.getOutput().getLabel();
+        } catch (IllegalArgumentException e) {
+            /* This happens when none of the features exist in the model */
+            return "Others";
+        }
+
+        /*
         System.out.println("Input title: " + jobTitle);
         System.out.println("Predicted class: " + prediction.getOutput().getLabel());
         System.out.println("Class probabilities: " + prediction.getOutputScores());
-        
-        return prediction.getOutput().getLabel();
+        */
     }
 }
